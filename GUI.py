@@ -49,7 +49,7 @@ class MyFrame(wx.Frame):
         #Правая часть программы, список созданных актов и кнопки для работы с ними:
         #Создание и добавление кнопок в сайзер:
         self.send_actBTN = wx.Button(self, id=ID_BTN_SENDACT, label="Отправить Акт")
-        self.del_actBTN = wx.Button(self, id=ID_BTN_DELACT, label="Удалить из списка")
+        self.del_actBTN = wx.Button(self, id=ID_BTN_DELACT, label="Удалить файлы")
         self.rightSSendActsTopBTN.Add(self.send_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rightSSendActsTopBTN.Add(self.del_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
@@ -74,9 +74,15 @@ class MyFrame(wx.Frame):
         #Назначение главного сайзера
         self.SetSizer(self.mainSizer)
 
-
+        #Назначение событий
         self.Bind(wx.EVT_BUTTON, self.createActOn, id=ID_BTN_CRARCT)
         self.Bind(wx.EVT_BUTTON, self.sendActOn, id=ID_BTN_SENDACT)
+        self.Bind(wx.EVT_BUTTON, self.del_acts_action, id=ID_BTN_DELACT)
+
+
+    def del_acts_action(self, event):
+        if event.GetId() == ID_BTN_DELACT:
+            print('press del acts')
 
     def refresh_list_acts(self):
         self.OLVlocal_acts.SetObjects(getlistfiles.getDictFilesParam())
@@ -89,13 +95,9 @@ class MyFrame(wx.Frame):
 
     def sendActOn(self, event):
         if event.GetId() == ID_BTN_SENDACT:
-            print('press' + str(event.GetId()))
             selection = self.OLVlocal_acts.GetSelectedObjects()
-            print(selection)
             if selection:
-                print('True')
                 theme = 'АЗС ' + re.sub('\\D', '', selection[0]['title'].split('_')[1]) + ' ССО '
-                print(theme)
                 themeset = set()
                 bodiez = 'Доброго времени суток.<br />'
                 if len(selection) == 1:
