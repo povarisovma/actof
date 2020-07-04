@@ -83,6 +83,22 @@ class MyFrame(wx.Frame):
     def del_acts_action(self, event):
         if event.GetId() == ID_BTN_DELACT:
             print('press del acts')
+            selection = self.OLVlocal_acts.GetSelectedObjects()
+            if selection:
+                dlg = wx.MessageBox('Удалить выбранные файлы?', 'Подтверждение', wx.YES_NO | wx.NO_DEFAULT, self)
+                if dlg == wx.YES:
+                    print('YES')
+                    for i in range(len(selection)):
+                        pathdocx = os.path.abspath('local_acts') + '\\' + selection[i]['title'].rstrip('pdf') + 'docx'
+                        pathpdf = os.path.abspath('local_acts') + '\\' + selection[i]['title']
+                        print(pathdocx)
+                        print(pathpdf)
+                        os.remove(pathdocx)
+                        os.remove(pathpdf)
+                        self.refresh_list_acts()
+                elif dlg == wx.NO:
+                    print('NO')
+
 
     def refresh_list_acts(self):
         self.OLVlocal_acts.SetObjects(getlistfiles.getDictFilesParam())
