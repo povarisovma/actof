@@ -55,30 +55,25 @@ class MyFrame(wx.Frame):
 
         self.rightSSendActs.Add(self.rightSSendActsTopBTN, proportion=0, flag=wx.EXPAND)
 
-        # self.lc_actlist = wx.ListCtrl(self, id=ID_LC_ACTLIST, style=wx.LC_REPORT)
-        # self.lc_actlist = ListCtrlMixinx(self)
-        # self.lc_actlist.InsertColumn(0, 'Имя файла', width=200)
-        # self.lc_actlist.InsertColumn(1, 'Дата создания', width=150)
-        # self.lc_actlist.InsertColumn(2, 'Дата изменения', width=150)
-        # for i in getlistfiles.getlistfiles():
-        #     self.lc_actlist.Append(i)
-        # self.refresh_list_acts()
+        #Создание списка актов
         self.OLVlocal_acts = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+        #Создание столбцов
         title = ColumnDefn("Title", "left", 220, "title", isSpaceFilling=False)
         creating = ColumnDefn("Date Creating", "left", 150, "creating", isSpaceFilling=False)
         modifine = ColumnDefn("Date Modifine", "left", 150, "modifine", isSpaceFilling=False)
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
+        #Добавление в список актов из папки locals_act
         self.OLVlocal_acts.SetObjects(getlistfiles.getDictFilesParam())
-
-        # self.rightSSendActs.Add(self.lc_actlist, proportion=1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
+        #Добавление списка актов в сайзер
         self.rightSSendActs.Add(self.OLVlocal_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
+        #Добавление правого сайзера в главный сайзер.
         self.mainSizer.Add(self.rightSSendActs, proportion=0, flag=wx.EXPAND)
-        self.SetSizer(self.mainSizer)
-        # self.Layout()
 
-        # self.Centre(wx.BOTH)
+        #Назначение главного сайзера
+        self.SetSizer(self.mainSizer)
+
 
         self.Bind(wx.EVT_BUTTON, self.createActOn, id=ID_BTN_CRARCT)
         self.Bind(wx.EVT_BUTTON, self.sendActOn, id=ID_BTN_SENDACT)
@@ -90,7 +85,6 @@ class MyFrame(wx.Frame):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
             actname = docxfilemaker.createdocxnpdffiles(txtlst)
-            # self.lc_actlist.Append((actname, 'Создан'))
             self.refresh_list_acts()
 
     def sendActOn(self, event):
@@ -127,45 +121,6 @@ class MyFrame(wx.Frame):
                 print('Отправка письма')
                 mess.Display(True)
                 print('Письмо отправлено')
-            # selection = []
-            # index = self.OLVlocal_acts.GetSelectedObjects()
-            # selection.append(index)
-            # while len(selection) != self.lc_actlist.GetSelectedItemCount() and index != -1:
-            #     index = self.lc_actlist.GetNextSelected(index)
-            #     selection.append(index)
-            # if selection[0] != -1:
-            #     theme = 'АЗС ' + re.sub('\\D', '', self.lc_actlist.GetItemText(selection[0]).split('_')[1]) + ' ССО '
-            #     themeset = set()
-            #     bodiez = 'Доброго времени суток.<br />'
-            #     if len(selection) == 1:
-            #         bodiez += 'Высылаю акт '
-            #     if len(selection) > 1:
-            #         bodiez += 'Высылаю акты '
-            #     for i in selection:
-            #         themeset.add(re.sub('\\D', '', self.lc_actlist.GetItemText(i).split('_')[2]))
-            #         bodiez += re.sub('\\D', '', self.lc_actlist.GetItemText(i).split('_')[0]) + ', '
-            #     for z in themeset:
-            #         theme += z + ' '
-            #     bodiez = bodiez.rstrip(', ') + '.'
-            #     print('Создание письма')
-            #     app = win32com.client.Dispatch("Outlook.Application")
-            #     mess = app.CreateItem(0)
-            #     mess.Subject = theme
-            #     mess.GetInspector()
-            #     index = mess.HTMLbody.find('>', mess.HTMLbody.find('<body'))
-            #     mess.HTMLbody = mess.HTMLbody[:index + 1] + bodiez + mess.HTMLbody[index + 1:]
-            #     for i in selection:
-            #         path = os.path.abspath('local_acts') + '\\' + self.lc_actlist.GetItemText(i)
-            #         mess.Attachments.Add(path)
-            #     print('Отправка письма')
-            #     mess.Display(True)
-            #     print('Письмо отправлено')
-
-
-
-
-
-
 
 
 def main():
