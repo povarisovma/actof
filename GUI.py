@@ -59,8 +59,8 @@ class MyFrame(wx.Frame):
         self.OLVlocal_acts = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
         title = ColumnDefn("Title", "left", 220, "title", isSpaceFilling=False)
-        creating = ColumnDefn("Date Creating", "left", 150, "creating", isSpaceFilling=False)
-        modifine = ColumnDefn("Date Modifine", "left", 150, "modifine", isSpaceFilling=False)
+        creating = ColumnDefn("Date Creating", "left", 150, "creating",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
+        modifine = ColumnDefn("Date Modifine", "left", 150, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
         #Добавление в список актов из папки locals_act
@@ -84,7 +84,7 @@ class MyFrame(wx.Frame):
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
-            actname = docxfilemaker.createdocxnpdffiles(txtlst)
+            docxfilemaker.createdocxnpdffiles(txtlst)
             self.refresh_list_acts()
 
     def sendActOn(self, event):

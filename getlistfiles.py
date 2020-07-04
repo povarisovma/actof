@@ -62,7 +62,7 @@ def getDictFilesParam():
 
 
         for file in pdflist:
-            generallist.append({"title": file, "creating": datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(path, file))).strftime("%d-%m-%Y %H.%M.%S"),
-                               "modifine": datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(path, file))).strftime("%d-%m-%Y %H.%M.%S")})
+            generallist.append({"title": file, "creating": datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(path, file))),
+                               "modifine": datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(path, file)))})
     return generallist
 
