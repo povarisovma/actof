@@ -10,6 +10,7 @@ from ObjectListView import ObjectListView, ColumnDefn
 ID_BTN_CRARCT = 15
 ID_BTN_SENDACT = 25
 ID_BTN_DELACT = 26
+ID_BTN_REFLACT = 27
 ID_LC_ACTLIST = 35
 
 class ListCtrlMixinx(wx.ListCtrl, wx.lib.mixins.listctrl.ColumnSorterMixin):
@@ -50,8 +51,10 @@ class MyFrame(wx.Frame):
         #Создание и добавление кнопок в сайзер:
         self.send_actBTN = wx.Button(self, id=ID_BTN_SENDACT, label="Отправить Акт")
         self.del_actBTN = wx.Button(self, id=ID_BTN_DELACT, label="Удалить файлы")
+        self.refresh_lactsBTN = wx.Button(self, id=ID_BTN_REFLACT, label="Обновить список")
         self.rightSSendActsTopBTN.Add(self.send_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rightSSendActsTopBTN.Add(self.del_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
+        self.rightSSendActsTopBTN.Add(self.refresh_lactsBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
         self.rightSSendActs.Add(self.rightSSendActsTopBTN, proportion=0, flag=wx.EXPAND)
 
@@ -59,8 +62,8 @@ class MyFrame(wx.Frame):
         self.OLVlocal_acts = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
         title = ColumnDefn("Title", "left", 220, "title", isSpaceFilling=False)
-        creating = ColumnDefn("Date Creating", "left", 150, "creating",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
-        modifine = ColumnDefn("Date Modifine", "left", 150, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
+        creating = ColumnDefn("Date Creating", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
+        modifine = ColumnDefn("Date Modifine", "left", 130, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
         #Добавление в список актов из папки locals_act
@@ -78,6 +81,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.createActOn, id=ID_BTN_CRARCT)
         self.Bind(wx.EVT_BUTTON, self.sendActOn, id=ID_BTN_SENDACT)
         self.Bind(wx.EVT_BUTTON, self.del_acts_action, id=ID_BTN_DELACT)
+        self.Bind(wx.EVT_BUTTON, self.refresh_list_acts, id=ID_BTN_REFLACT)
 
 
     def del_acts_action(self, event):
@@ -91,17 +95,17 @@ class MyFrame(wx.Frame):
                         pathpdf = os.path.abspath('local_acts') + '\\' + selection[i]['title']
                         os.remove(pathdocx)
                         os.remove(pathpdf)
-                        self.refresh_list_acts()
+                        self.refresh_list_acts(event)
 
 
-    def refresh_list_acts(self):
+    def refresh_list_acts(self, event):
         self.OLVlocal_acts.SetObjects(getlistfiles.getDictFilesParam())
 
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
             docxfilemaker.createdocxnpdffiles(txtlst)
-            self.refresh_list_acts()
+            self.refresh_list_acts(event)
 
     def sendActOn(self, event):
         if event.GetId() == ID_BTN_SENDACT:
