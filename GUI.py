@@ -12,6 +12,9 @@ ID_BTN_SENDACT = 25
 ID_BTN_DELACT = 26
 ID_BTN_REFLACT = 27
 ID_LC_ACTLIST = 35
+ID_MB_EXIT = 45
+ID_MB_OPENDOCX = 46
+ID_MB_SETTINGS = 47
 
 class ListCtrlMixinx(wx.ListCtrl, wx.lib.mixins.listctrl.ColumnSorterMixin):
     def __init__(self, parent, *args, **kw):
@@ -27,7 +30,25 @@ class MyFrame(wx.Frame):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title='ActOf', size=wx.Size(1037, 605),
                           style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
-        #Объявление сайзеров:
+        #Создание меню
+        menubar = wx.MenuBar()
+        fileMenu = wx.Menu()
+        refMenu = wx.Menu()
+
+        # item = wx.MenuItem(fileMenu, wx.ID_EXIT, "Выход", "Выход из приложения")
+        # fileMenu.Append(item)
+        fileMenu.Append(ID_MB_OPENDOCX, "Открыть шаблон docx", "Указание место положения шаблона docx")
+        fileMenu.Append(ID_MB_SETTINGS, "Настройки", "Открытие окна настроек")
+        fileMenu.AppendSeparator()
+        fileMenu.Append(ID_MB_EXIT, "Выход", "Выход из приложения")
+
+        menubar.Append(fileMenu, "Файл")
+        menubar.Append(refMenu, "Справка")
+        self.SetMenuBar(menubar)
+
+        self.Bind(wx.EVT_MENU, self.onQuit, id=ID_MB_EXIT)
+
+        #Объявление сайзеров------------------------------------------------------------------------
         #Главный сайзер программы:
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
         #Центральная часть(CA = CREATE ACTS): сайзер для создания актов:
@@ -62,8 +83,10 @@ class MyFrame(wx.Frame):
         self.OLVlocal_acts = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
         title = ColumnDefn("Title", "left", 220, "title", isSpaceFilling=False)
-        creating = ColumnDefn("Date Creating", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
-        modifine = ColumnDefn("Date Modifine", "left", 130, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S", isSpaceFilling=False)
+        creating = ColumnDefn("Date Creating", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S",
+                              isSpaceFilling=False)
+        modifine = ColumnDefn("Date Modifine", "left", 130, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S",
+                              isSpaceFilling=False)
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
         #Добавление в список актов из папки locals_act
@@ -82,6 +105,9 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.sendActOn, id=ID_BTN_SENDACT)
         self.Bind(wx.EVT_BUTTON, self.del_acts_action, id=ID_BTN_DELACT)
         self.Bind(wx.EVT_BUTTON, self.refresh_list_acts, id=ID_BTN_REFLACT)
+
+    def onQuit(self, event):
+        self.Close()
 
 
     def del_acts_action(self, event):
