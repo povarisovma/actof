@@ -12,9 +12,12 @@ ID_BTN_SENDACT = 25
 ID_BTN_DELACT = 26
 ID_BTN_REFLACT = 27
 ID_LC_ACTLIST = 35
-ID_MB_EXIT = 45
-ID_MB_OPENDOCX = 46
-ID_MB_SETTINGS = 47
+ID_MB_EXIT = 41
+ID_MB_OPENDOCX = 42
+ID_MB_SETTINGS = 43
+ID_MB_OPENFOLDERLOCAL = 51
+ID_MB_OPENFOLDERREPO = 52
+ID_MB_ABOUT = 61
 
 class ListCtrlMixinx(wx.ListCtrl, wx.lib.mixins.listctrl.ColumnSorterMixin):
     def __init__(self, parent, *args, **kw):
@@ -34,19 +37,30 @@ class MyFrame(wx.Frame):
         menubar = wx.MenuBar()
         fileMenu = wx.Menu()
         refMenu = wx.Menu()
+        ftMenu = wx.Menu()
 
-        # item = wx.MenuItem(fileMenu, wx.ID_EXIT, "Выход", "Выход из приложения")
-        # fileMenu.Append(item)
-        fileMenu.Append(ID_MB_OPENDOCX, "Открыть шаблон docx", "Указание место положения шаблона docx")
         fileMenu.Append(ID_MB_SETTINGS, "Настройки", "Открытие окна настроек")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_MB_EXIT, "Выход", "Выход из приложения")
 
+        ftMenu.Append(ID_MB_OPENFOLDERLOCAL, "Открыть папку локальных актов")
+        ftMenu.Append(ID_MB_OPENFOLDERREPO, "Открыть папку актов")
+        ftMenu.Append(ID_MB_OPENDOCX, "Открыть шаблон docx")
+
+        refMenu.Append(ID_MB_ABOUT, "О программе", "Описание программы")
+
         menubar.Append(fileMenu, "Файл")
+        menubar.Append(ftMenu, "Навигация")
         menubar.Append(refMenu, "Справка")
         self.SetMenuBar(menubar)
 
+        self.Bind(wx.EVT_MENU, self.onSettings, id=ID_MB_SETTINGS)
         self.Bind(wx.EVT_MENU, self.onQuit, id=ID_MB_EXIT)
+        self.Bind(wx.EVT_MENU, self.openFolderLocalActs, id=ID_MB_OPENFOLDERLOCAL)
+        self.Bind(wx.EVT_MENU, self.openFolderActs, id=ID_MB_OPENFOLDERREPO)
+        self.Bind(wx.EVT_MENU, self.openDocxTemplate, id=ID_MB_OPENDOCX)
+        self.Bind(wx.EVT_MENU, self.about, id=ID_MB_ABOUT)
+
 
         #Объявление сайзеров------------------------------------------------------------------------
         #Главный сайзер программы:
@@ -106,9 +120,23 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.del_acts_action, id=ID_BTN_DELACT)
         self.Bind(wx.EVT_BUTTON, self.refresh_list_acts, id=ID_BTN_REFLACT)
 
+    def onSettings(self, event):
+        print("open settings")
+
     def onQuit(self, event):
         self.Close()
 
+    def openFolderLocalActs(self, event):
+        print("open folder local acts")
+
+    def openFolderActs(self, event):
+        print("open folder acts")
+
+    def openDocxTemplate(self, event):
+        print("open docx template")
+
+    def about(self, event):
+        print("open about")
 
     def del_acts_action(self, event):
         if event.GetId() == ID_BTN_DELACT:
