@@ -19,6 +19,11 @@ ID_MB_OPENFOLDERLOCAL = 51
 ID_MB_OPENFOLDERREPO = 52
 ID_MB_ABOUT = 61
 
+
+class MyDlg(wx.Dialog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 class ListCtrlMixinx(wx.ListCtrl, wx.lib.mixins.listctrl.ColumnSorterMixin):
     def __init__(self, parent, *args, **kw):
         wx.ListCtrl.__init__(self, parent, wx.ID_ANY, style=wx.LC_REPORT)
@@ -122,6 +127,10 @@ class MyFrame(wx.Frame):
 
     def onSettings(self, event):
         print("open settings")
+        with MyDlg(self, title="Настройки") as dlg:
+            res = dlg.ShowModal()
+
+        print(res, wx.ID_CANCEL)
 
     def onQuit(self, event):
         self.Close()
