@@ -6,6 +6,7 @@ import os
 import getlistfiles
 import wx.lib.mixins.listctrl
 import settings
+import mydlg
 from ObjectListView import ObjectListView, ColumnDefn
 
 ID_BTN_CRARCT = 15
@@ -19,75 +20,6 @@ ID_MB_SETTINGS = 43
 ID_MB_OPENFOLDERLOCAL = 51
 ID_MB_OPENFOLDERREPO = 52
 ID_MB_ABOUT = 61
-
-ID_MD_CHOSDIRLOC = 105
-ID_MD_CHOSDIR = 106
-ID_MD_CHOSTMPL = 107
-ID_MD_PATHDIRACTLOC = 111
-ID_MD_PATHDIRACT = 112
-
-
-class MyDlg(wx.Dialog):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.SetSize(500, 500)
-
-        #Обьявление главного сайзера:
-        self.mainsizer = wx.BoxSizer(wx.VERTICAL)
-
-        #Блок 1, виджеты для указания пути к папке локальных актов--------------------------------------------------
-        #Добавление статического текста "Путь к папке с локальными актами" в сайзер:
-        self.mainsizer.Add(wx.StaticText(self, wx.ID_ANY, label="Путь к папке с локальными актами:"),
-                           flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        #Создание горизонтального сайзера для добавления поля ввода и кнопки для выбора папки
-        # а также добавление его в главный сайзер:
-        self.folderactssizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.mainsizer.Add(self.folderactssizer, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        #Создание текстового поля для ввода пути, а также его добавление в горизонтальный сайзер:
-        self.tc_actloc_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACTLOC, value=settings.get_local_acts_path())
-        self.folderactssizer.Add(self.tc_actloc_path, proportion=1)
-        #Создание кнопки для открытия диалогового окна выбора папки, и добавление его в горизонтальный сайзер:
-        self.folderactssizer.Add(wx.Button(self, id=ID_MD_CHOSDIRLOC, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
-
-        # Блок 2, виджеты для указания пути к папке общих актов------------------------------------------------------
-        # Добавление статического текста "Путь к папке с общими актами" в сайзер:
-        self.mainsizer.Add(wx.StaticText(self, wx.ID_ANY, label="Путь к папке с общими актами:"),
-                           flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        # Создание горизонтального сайзера для добавления поля ввода и кнопки для выбора папки
-        # а также добавление его в главный сайзер:
-        self.folderactssizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.mainsizer.Add(self.folderactssizer2, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        # Создание текстового поля для ввода пути, а также его добавление в горизонтальный сайзер:
-        self.tc_act_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACT, value=settings.get_general_acts_path())
-        self.folderactssizer2.Add(self.tc_act_path, proportion=1)
-        # Создание кнопки для открытия диалогового окна выбора папки, и добавление его в горизонтальный сайзер:
-        self.folderactssizer2.Add(wx.Button(self, id=ID_MD_CHOSDIR, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
-
-        #Добавление главного сайзера с виджетами в окно
-        self.SetSizer(self.mainsizer)
-
-        #Назначение кнопок и функций
-        self.Bind(wx.EVT_BUTTON, self.choosediractsloc, id=ID_MD_CHOSDIRLOC)
-        self.Bind(wx.EVT_BUTTON, self.choosediracts, id=ID_MD_CHOSDIR)
-
-    def choosediractsloc(self, event):
-        dlg = wx.DirDialog(self, message="Выберите папку расположения локальных актов", defaultPath=self.tc_actloc_path.GetValue())
-        res = dlg.ShowModal()
-        if res == wx.ID_OK:
-            print(dlg.GetPath())
-            self.tc_actloc_path.SetValue(dlg.GetPath())
-            settings.set_local_acts_path(dlg.GetPath())
-
-
-    def choosediracts(self, event):
-        dlg1 = wx.DirDialog(self, message="Выберите папку расположения общих актов", defaultPath=self.tc_act_path.GetValue())
-        res = dlg1.ShowModal()
-        if res == wx.ID_OK:
-            print(dlg1.GetPath())
-            self.tc_act_path.SetValue(dlg1.GetPath())
-            settings.set_general_acts_path(dlg1.GetPath())
-
-
 
 class MyFrame(wx.Frame):
     def __init__(self, parent):
@@ -183,19 +115,18 @@ class MyFrame(wx.Frame):
 
     def onSettings(self, event):
         print("open settings")
-        with MyDlg(self, title="Настройки") as dlg:
+        with mydlg.MyDlg(self, title="Настройки") as dlg:
             res = dlg.ShowModal()
-
         print(res, wx.ID_CANCEL)
 
     def onQuit(self, event):
         self.Close()
 
     def openFolderLocalActs(self, event):
-        print("open folder local acts")
+        os.startfile(os.path.realpath(settings.get_local_acts_path()))
 
     def openFolderActs(self, event):
-        print("open folder acts")
+        os.startfile(os.path.realpath(settings.get_general_acts_path()))
 
     def openDocxTemplate(self, event):
         print("open docx template")
@@ -256,13 +187,3 @@ class MyFrame(wx.Frame):
                 print('Отправка письма')
                 mess.Display(True)
                 print('Письмо отправлено')
-
-
-def main():
-    app = wx.App()
-    frame = MyFrame(None).Show()
-    app.MainLoop()
-
-
-if __name__ == '__main__':
-    main()

@@ -39,6 +39,7 @@ def get_general_acts_path(path=path_to_prog()):
 def set_local_acts_path(str_path, path=path_to_prog()):
     config = configparser.ConfigParser()
     config.read(path)
+    # str_path.replaceAll("\\", "\\")
     config.set("Settings", "local_acts_path", str_path)
     with open(path, "w") as config_file:
         config.write(config_file)
