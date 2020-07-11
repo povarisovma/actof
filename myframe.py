@@ -47,6 +47,7 @@ class MyFrame(wx.Frame):
         menubar.Append(refMenu, "Справка")
         self.SetMenuBar(menubar)
 
+        #Назначение функций кнопкам меню:
         self.Bind(wx.EVT_MENU, self.onSettings, id=ID_MB_SETTINGS)
         self.Bind(wx.EVT_MENU, self.onQuit, id=ID_MB_EXIT)
         self.Bind(wx.EVT_MENU, self.openFolderLocalActs, id=ID_MB_OPENFOLDERLOCAL)

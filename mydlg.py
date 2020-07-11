@@ -1,5 +1,4 @@
 import wx
-# import wx.lib.mixins.listctrl
 import settings
 
 
@@ -13,37 +12,26 @@ ID_MD_PATHDIRACT = 112
 class MyDlg(wx.Dialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.SetSize(500, 500)
 
         #Обьявление главного сайзера:
         self.mainsizer = wx.BoxSizer(wx.VERTICAL)
 
         #Блок 1, виджеты для указания пути к папке локальных актов--------------------------------------------------
-        #Добавление статического текста "Путь к папке с локальными актами" в сайзер:
         self.mainsizer.Add(wx.StaticText(self, wx.ID_ANY, label="Путь к папке с локальными актами:"),
                            flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        #Создание горизонтального сайзера для добавления поля ввода и кнопки для выбора папки
-        # а также добавление его в главный сайзер:
         self.folderactssizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        #Создание текстового поля для ввода пути, а также его добавление в горизонтальный сайзер:
         self.tc_actloc_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACTLOC, value=settings.get_local_acts_path())
         self.folderactssizer.Add(self.tc_actloc_path, proportion=1)
-        #Создание кнопки для открытия диалогового окна выбора папки, и добавление его в горизонтальный сайзер:
         self.folderactssizer.Add(wx.Button(self, id=ID_MD_CHOSDIRLOC, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
 
         # Блок 2, виджеты для указания пути к папке общих актов------------------------------------------------------
-        # Добавление статического текста "Путь к папке с общими актами" в сайзер:
         self.mainsizer.Add(wx.StaticText(self, wx.ID_ANY, label="Путь к папке с общими актами:"),
                            flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        # Создание горизонтального сайзера для добавления поля ввода и кнопки для выбора папки
-        # а также добавление его в главный сайзер:
         self.folderactssizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer2, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        # Создание текстового поля для ввода пути, а также его добавление в горизонтальный сайзер:
         self.tc_act_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACT, value=settings.get_general_acts_path())
         self.folderactssizer2.Add(self.tc_act_path, proportion=1)
-        # Создание кнопки для открытия диалогового окна выбора папки, и добавление его в горизонтальный сайзер:
         self.folderactssizer2.Add(wx.Button(self, id=ID_MD_CHOSDIR, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
 
         #Добавление главного сайзера с виджетами в окно
