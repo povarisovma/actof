@@ -30,7 +30,7 @@ ID_MD_PATHDIRACT = 112
 class MyDlg(wx.Dialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.SetSize(500, 500)
+        # self.SetSize(500, 500)
 
         #Обьявление главного сайзера:
         self.mainsizer = wx.BoxSizer(wx.VERTICAL)
@@ -58,20 +58,10 @@ class MyDlg(wx.Dialog):
         self.folderactssizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer2, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
         # Создание текстового поля для ввода пути, а также его добавление в горизонтальный сайзер:
-        self.tc_act_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACT, value="C:\\")
+        self.tc_act_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACT, value=settings.get_general_acts_path())
         self.folderactssizer2.Add(self.tc_act_path, proportion=1)
         # Создание кнопки для открытия диалогового окна выбора папки, и добавление его в горизонтальный сайзер:
         self.folderactssizer2.Add(wx.Button(self, id=ID_MD_CHOSDIR, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
-        #TODO придумать и реализовать указание шаблона, пока не понятно как лучше это отразить и вообще надо ли?
-        #Блок 3, виджеты для указания пути к шаблону docx
-        self.mainsizer.Add(wx.StaticText(self, wx.ID_ANY, label="Путь к docx шаблону:"),
-                           flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-
-        self.folderactssizer3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.mainsizer.Add(self.folderactssizer3, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        self.folderactssizer3.Add(wx.TextCtrl(self, wx.ID_ANY, value="C:\\"), proportion=1)
-        self.folderactssizer3.Add(wx.Button(self, id=ID_MD_CHOSTMPL, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
-
 
         #Добавление главного сайзера с виджетами в окно
         self.SetSizer(self.mainsizer)
@@ -79,11 +69,9 @@ class MyDlg(wx.Dialog):
         #Назначение кнопок и функций
         self.Bind(wx.EVT_BUTTON, self.choosediractsloc, id=ID_MD_CHOSDIRLOC)
         self.Bind(wx.EVT_BUTTON, self.choosediracts, id=ID_MD_CHOSDIR)
-        self.Bind(wx.EVT_BUTTON, self.choosetempldocx, id=ID_MD_CHOSTMPL)
 
     def choosediractsloc(self, event):
-        print("press choose directory loc acts", event.GetId())
-        dlg = wx.DirDialog(self, message="Выберете папку расположения локальных актов", defaultPath=self.tc_actloc_path.GetValue())
+        dlg = wx.DirDialog(self, message="Выберите папку расположения локальных актов", defaultPath=self.tc_actloc_path.GetValue())
         res = dlg.ShowModal()
         if res == wx.ID_OK:
             print(dlg.GetPath())
@@ -92,15 +80,13 @@ class MyDlg(wx.Dialog):
 
 
     def choosediracts(self, event):
-        print("press choose directory acts", event.GetId())
-        dlg1 = wx.DirDialog(self, message="Hello", defaultPath=self.tc_act_path.GetValue())
+        dlg1 = wx.DirDialog(self, message="Выберите папку расположения общих актов", defaultPath=self.tc_act_path.GetValue())
         res = dlg1.ShowModal()
         if res == wx.ID_OK:
             print(dlg1.GetPath())
             self.tc_act_path.SetValue(dlg1.GetPath())
+            settings.set_general_acts_path(dlg1.GetPath())
 
-    def choosetempldocx(self, event):
-        print("press choose docx template", event.GetId())
 
 
 class MyFrame(wx.Frame):
