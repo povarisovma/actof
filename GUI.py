@@ -5,6 +5,7 @@ import re
 import os
 import getlistfiles
 import wx.lib.mixins.listctrl
+import settings
 from ObjectListView import ObjectListView, ColumnDefn
 
 ID_BTN_CRARCT = 15
@@ -43,7 +44,7 @@ class MyDlg(wx.Dialog):
         self.folderactssizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
         #Создание текстового поля для ввода пути, а также его добавление в горизонтальный сайзер:
-        self.tc_actloc_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACTLOC, value="C:\\")
+        self.tc_actloc_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACTLOC, value=settings.get_local_acts_path())
         self.folderactssizer.Add(self.tc_actloc_path, proportion=1)
         #Создание кнопки для открытия диалогового окна выбора папки, и добавление его в горизонтальный сайзер:
         self.folderactssizer.Add(wx.Button(self, id=ID_MD_CHOSDIRLOC, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
@@ -87,6 +88,7 @@ class MyDlg(wx.Dialog):
         if res == wx.ID_OK:
             print(dlg.GetPath())
             self.tc_actloc_path.SetValue(dlg.GetPath())
+            settings.set_local_acts_path(dlg.GetPath())
 
 
     def choosediracts(self, event):
