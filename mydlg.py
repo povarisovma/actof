@@ -21,7 +21,7 @@ class MyDlg(wx.Dialog):
                            flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
         self.folderactssizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        self.tc_actloc_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACTLOC, value=settings.get_local_acts_path())
+        self.tc_actloc_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACTLOC, value=settings.get_local_acts_path_folder())
         self.folderactssizer.Add(self.tc_actloc_path, proportion=1)
         self.folderactssizer.Add(wx.Button(self, id=ID_MD_CHOSDIRLOC, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
 
@@ -30,7 +30,7 @@ class MyDlg(wx.Dialog):
                            flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
         self.folderactssizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer2, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        self.tc_act_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACT, value=settings.get_general_acts_path())
+        self.tc_act_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACT, value=settings.get_general_acts_path_folder())
         self.folderactssizer2.Add(self.tc_act_path, proportion=1)
         self.folderactssizer2.Add(wx.Button(self, id=ID_MD_CHOSDIR, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
 
@@ -47,7 +47,7 @@ class MyDlg(wx.Dialog):
         if res == wx.ID_OK:
             print(dlg.GetPath())
             self.tc_actloc_path.SetValue(dlg.GetPath())
-            settings.set_local_acts_path(dlg.GetPath())
+            settings.set_local_acts_path_folder_in_settings(dlg.GetPath())
 
 
     def choosediracts(self, event):
@@ -56,4 +56,4 @@ class MyDlg(wx.Dialog):
         if res == wx.ID_OK:
             print(dlg1.GetPath())
             self.tc_act_path.SetValue(dlg1.GetPath())
-            settings.set_general_acts_path(dlg1.GetPath())
+            settings.set_general_acts_path_folder_in_settings(dlg1.GetPath())

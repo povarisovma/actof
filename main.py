@@ -5,7 +5,7 @@ import myframe
 
 
 def main():
-    settings.createConfig()
+    settings.create_settings_file()
     app = wx.App()
     frame = myframe.MyFrame(None).Show()
     app.MainLoop()

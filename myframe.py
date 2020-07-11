@@ -124,10 +124,10 @@ class MyFrame(wx.Frame):
         self.Close()
 
     def openFolderLocalActs(self, event):
-        os.startfile(os.path.realpath(settings.get_local_acts_path()))
+        os.startfile(os.path.realpath(settings.get_local_acts_path_folder()))
 
     def openFolderActs(self, event):
-        os.startfile(os.path.realpath(settings.get_general_acts_path()))
+        os.startfile(os.path.realpath(settings.get_general_acts_path_folder()))
 
     def openDocxTemplate(self, event):
         print("open docx template")
