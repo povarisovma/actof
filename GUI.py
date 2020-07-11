@@ -21,7 +21,7 @@ ID_MB_ABOUT = 61
 
 ID_MD_CHOSDIRLOC = 105
 ID_MD_CHOSDIR = 106
-ID_MD_CHOSTMPL = 106
+ID_MD_CHOSTMPL = 107
 ID_MD_PATHDIRACTLOC = 111
 ID_MD_PATHDIRACT = 112
 
@@ -61,7 +61,8 @@ class MyDlg(wx.Dialog):
         self.folderactssizer2.Add(self.tc_act_path, proportion=1)
         # Создание кнопки для открытия диалогового окна выбора папки, и добавление его в горизонтальный сайзер:
         self.folderactssizer2.Add(wx.Button(self, id=ID_MD_CHOSDIR, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
-
+        #TODO придумать и реализовать указание шаблона, пока не понятно как лучше это отразить и вообще надо ли?
+        #Блок 3, виджеты для указания пути к шаблону docx
         self.mainsizer.Add(wx.StaticText(self, wx.ID_ANY, label="Путь к docx шаблону:"),
                            flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
 
@@ -71,9 +72,10 @@ class MyDlg(wx.Dialog):
         self.folderactssizer3.Add(wx.Button(self, id=ID_MD_CHOSTMPL, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
 
 
-
+        #Добавление главного сайзера с виджетами в окно
         self.SetSizer(self.mainsizer)
 
+        #Назначение кнопок и функций
         self.Bind(wx.EVT_BUTTON, self.choosediractsloc, id=ID_MD_CHOSDIRLOC)
         self.Bind(wx.EVT_BUTTON, self.choosediracts, id=ID_MD_CHOSDIR)
         self.Bind(wx.EVT_BUTTON, self.choosetempldocx, id=ID_MD_CHOSTMPL)
