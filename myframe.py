@@ -1,5 +1,5 @@
 import wx
-import docxfilemaker
+import fileProcessing
 import win32com.client
 import re
 import os
@@ -21,11 +21,11 @@ ID_MB_OPENFOLDERLOCAL = 51
 ID_MB_OPENFOLDERREPO = 52
 ID_MB_ABOUT = 61
 
+
 class MyFrame(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title='ActOf', size=wx.Size(1037, 605),
                           style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
-
         #Создание меню
         menubar = wx.MenuBar()
         fileMenu = wx.Menu()
@@ -155,7 +155,7 @@ class MyFrame(wx.Frame):
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
-            docxfilemaker.createdocxnpdffiles(txtlst)
+            fileProcessing.createdocxnpdffiles(txtlst)
             self.refresh_list_acts(event)
 
     def sendActOn(self, event):
