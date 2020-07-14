@@ -115,12 +115,8 @@ def create_docx_file_from_bodylist(blist):
     return filenamedocx
 
 
-def get_path():
-    return settings.get_general_acts_path_folder()
-
-
 def get_number_act():
-    filelist = os.listdir(get_path())
+    filelist = os.listdir(settings.get_general_acts_path_folder())
     numacts = []
     nextnumact = ''
     for i in range(len(filelist)):
@@ -133,6 +129,7 @@ def get_number_act():
             nextnumact = str(numacts[i] + 1)
             break
     return nextnumact
+
 
 def create_pdf_file_from_docx(filenamedocx):
     wdFormatPDF = 17
