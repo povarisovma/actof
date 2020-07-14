@@ -1,11 +1,11 @@
 from docx.shared import Inches, Pt
 import docx
-import datetime
 from pytils import dt
 import os
 import win32com.client as com
 import shutil
 import re
+import settings
 
 
 def textforlist(textinput):
@@ -54,11 +54,11 @@ def get_current_date():
 def create_docx_file_from_bodylist(blist):
     doc = docx.Document('template.docx')
 
-    bottext = False
     AZSnum = get_from_bodylist_azsnum(blist)
     SSOnum = get_from_bodylist_ssonum(blist)
     ACTnum = get_number_act()
     nowdate = get_current_date()
+    bottext = False
     numline = 0
 
     for i in range(len(doc.paragraphs)):
@@ -109,10 +109,14 @@ def create_docx_file_from_bodylist(blist):
             p3.paragraph_format.space_after = Pt(0)
             numline += 1
             continue
+    del_empty_paragraphs(doc, blist)
+    filenamedocx = f"Акт{ACTnum}_АЗС{AZSnum}_ССО{SSOnum}.docx"
+    doc.save(settings.get_local_acts_path_folder() + filenamedocx)
+    return filenamedocx
 
 
 def get_path():
-    return r'E:\tested\Акты'
+    return settings.get_general_acts_path_folder()
 
 
 def get_number_act():
@@ -130,81 +134,103 @@ def get_number_act():
             break
     return nextnumact
 
+def create_pdf_file_from_docx(filenamedocx):
+    wdFormatPDF = 17
+    out_file = filenamedocx.strip(".docx")
+    word = com.DispatchEx('word.application')
+    doccon = word.Documents.Open(filenamedocx)
+    doccon.SaveAs(out_file, FileFormat=wdFormatPDF)
+    doccon.Close()
+    word.Quit()
+
+
+def copy_files_to_general_folder(filenamedocx):
+    shutil.copyfile(settings.get_local_acts_path_folder() + filenamedocx,
+                    settings.get_general_acts_path_folder() + filenamedocx)
+    filenamepdf = filenamedocx.strip(".docx") + ".pdf"
+    shutil.copyfile(settings.get_local_acts_path_folder() + filenamepdf,
+                    settings.get_general_acts_path_folder() + filenamepdf)
+
+
 def createdocxnpdffiles(lst):
+    namefile = create_docx_file_from_bodylist(lst)
+    create_pdf_file_from_docx(settings.get_local_acts_path_folder() + namefile)
+    copy_files_to_general_folder(namefile)
 
-    doc = docx.Document('template.docx')
+    #
+    # doc = docx.Document('template.docx')
+    #
+    #
+    #
+    #
+    # bottext = False
+    # textlist = lst
+    # AZSnum = get_from_bodylist_azsnum(lst)
+    # SSOnum = get_from_bodylist_ssonum(lst)
+    # ACTnum = get_number_act()
+    #
+    # now = datetime.datetime.now()
+    # nowdate = str(dt.ru_strftime("%d %B %Y" + ' г.', inflected=True))
+    # numline = 0
+    #
+    # for i in range(len(doc.paragraphs)):
+    #     if i == 0:
+    #         hd = doc.paragraphs[i]
+    #         hd.paragraph_format.space_after = Pt(10)
+    #         doc.paragraphs[i].text = 'АКТ № ' + ACTnum
+    #         doc.paragraphs[i].style = 'Normal'
+    #         doc.paragraphs[i].alignment = 1
+    #         doc.paragraphs[i].runs[0].bold = True
+    #         doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
+    #         doc.paragraphs[i].runs[0].font.size = Pt(14)
+    #         continue
+    #     if i == 1:
+    #         hd2 = doc.paragraphs[i]
+    #         hd2.paragraph_format.space_after = Pt(10)
+    #         doc.paragraphs[i].style = 'Normal'
+    #         doc.paragraphs[i].add_run('АЗС №' + AZSnum + '	ССО №' + SSOnum + '\t\t\t\t\t\t\t\t' + nowdate)
+    #         doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
+    #         doc.paragraphs[i].runs[0].font.size = Pt(12)
+    #         continue
+    #     if i > 1 and not bottext and numline < len(textlist):
+    #         p2 = doc.paragraphs[i]
+    #         run2 = p2.add_run('\t' + textlist[numline])
+    #
+    #         p2.paragraph_format.alignment = 3
+    #         if textlist[numline].find('В связи с чем') != -1:
+    #             bottext = True
+    #             p2.paragraph_format.space_before = Pt(0)
+    #             p2.paragraph_format.space_after = Pt(0)
+    #         else:
+    #             p2.paragraph_format.space_before = Pt(0)
+    #             p2.paragraph_format.space_after = Pt(0)
+    #         p2.paragraph_format.line_spacing = Pt(0)
+    #         run2.font.name = 'Times New Roman'
+    #         run2.font.size = Pt(12)
+    #         numline += 1
+    #         continue
+    #     if i > 1 and bottext and numline < len(textlist):
+    #         p3 = doc.paragraphs[i]
+    #         doc.paragraphs[i].style = 'List Paragraph'
+    #         run3 = p3.add_run('— ' + textlist[numline])
+    #         run3.font.name = 'Times New Roman'
+    #         run3.font.size = Pt(12)
+    #         p3.paragraph_format.left_indent = Inches(0.8)
+    #         p3.paragraph_format.alignment = 0
+    #         p3.paragraph_format.line_spacing = Pt(0)
+    #         p3.paragraph_format.space_before = Pt(0)
+    #         p3.paragraph_format.space_after = Pt(0)
+    #         numline += 1
+    #         continue
 
+    # del_empty_paragraphs(doc, textlist)
 
+    # filenamedocx = 'local_acts\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.docx'
+    # filenamepdf = 'local_acts\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.pdf'
+    # endfiledocx = get_path() + '\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.docx'
+    # endfilepdf = get_path() + '\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.pdf'
 
-
-    bottext = False
-    textlist = lst
-    AZSnum = get_from_bodylist_azsnum(lst)
-    SSOnum = get_from_bodylist_ssonum(lst)
-    ACTnum = get_number_act()
-
-    now = datetime.datetime.now()
-    nowdate = str(dt.ru_strftime("%d %B %Y" + ' г.', inflected=True))
-    numline = 0
-
-    for i in range(len(doc.paragraphs)):
-        if i == 0:
-            hd = doc.paragraphs[i]
-            hd.paragraph_format.space_after = Pt(10)
-            doc.paragraphs[i].text = 'АКТ № ' + ACTnum
-            doc.paragraphs[i].style = 'Normal'
-            doc.paragraphs[i].alignment = 1
-            doc.paragraphs[i].runs[0].bold = True
-            doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
-            doc.paragraphs[i].runs[0].font.size = Pt(14)
-            continue
-        if i == 1:
-            hd2 = doc.paragraphs[i]
-            hd2.paragraph_format.space_after = Pt(10)
-            doc.paragraphs[i].style = 'Normal'
-            doc.paragraphs[i].add_run('АЗС №' + AZSnum + '	ССО №' + SSOnum + '\t\t\t\t\t\t\t\t' + nowdate)
-            doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
-            doc.paragraphs[i].runs[0].font.size = Pt(12)
-            continue
-        if i > 1 and not bottext and numline < len(textlist):
-            p2 = doc.paragraphs[i]
-            run2 = p2.add_run('\t' + textlist[numline])
-
-            p2.paragraph_format.alignment = 3
-            if textlist[numline].find('В связи с чем') != -1:
-                bottext = True
-                p2.paragraph_format.space_before = Pt(0)
-                p2.paragraph_format.space_after = Pt(0)
-            else:
-                p2.paragraph_format.space_before = Pt(0)
-                p2.paragraph_format.space_after = Pt(0)
-            p2.paragraph_format.line_spacing = Pt(0)
-            run2.font.name = 'Times New Roman'
-            run2.font.size = Pt(12)
-            numline += 1
-            continue
-        if i > 1 and bottext and numline < len(textlist):
-            p3 = doc.paragraphs[i]
-            doc.paragraphs[i].style = 'List Paragraph'
-            run3 = p3.add_run('— ' + textlist[numline])
-            run3.font.name = 'Times New Roman'
-            run3.font.size = Pt(12)
-            p3.paragraph_format.left_indent = Inches(0.8)
-            p3.paragraph_format.alignment = 0
-            p3.paragraph_format.line_spacing = Pt(0)
-            p3.paragraph_format.space_before = Pt(0)
-            p3.paragraph_format.space_after = Pt(0)
-            numline += 1
-            continue
-
-    del_empty_paragraphs(doc, textlist)
-
-    filenamedocx = 'local_acts\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.docx'
-    filenamepdf = 'local_acts\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.pdf'
-    endfiledocx = get_path() + '\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.docx'
-    endfilepdf = get_path() + '\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.pdf'
-
-    doc.save(filenamedocx)
+    # doc.save(filenamedocx)
     #
     # wdFormatPDF = 17
     #

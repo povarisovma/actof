@@ -47,7 +47,7 @@ class MyDlg(wx.Dialog):
         if res == wx.ID_OK:
             print(dlg.GetPath())
             self.tc_actloc_path.SetValue(dlg.GetPath())
-            settings.set_local_acts_path_folder_in_settings(dlg.GetPath())
+            settings.set_local_acts_path_folder_in_settings(dlg.GetPath() + "\\")
 
 
     def choosediracts(self, event):
@@ -56,4 +56,4 @@ class MyDlg(wx.Dialog):
         if res == wx.ID_OK:
             print(dlg1.GetPath())
             self.tc_act_path.SetValue(dlg1.GetPath())
-            settings.set_general_acts_path_folder_in_settings(dlg1.GetPath())
+            settings.set_general_acts_path_folder_in_settings(dlg1.GetPath() + "\\")
