@@ -1,5 +1,4 @@
 import wx
-import wx.lib.mixins.listctrl
 import settings
 import myframe
 

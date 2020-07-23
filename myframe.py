@@ -3,8 +3,6 @@ import fileProcessing
 import win32com.client
 import re
 import os
-import getlistfiles
-import wx.lib.mixins.listctrl
 import settings
 import mydlg
 from ObjectListView import ObjectListView, ColumnDefn
@@ -98,7 +96,7 @@ class MyFrame(wx.Frame):
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
         #Добавление в список актов из папки locals_act
-        self.OLVlocal_acts.SetObjects(getlistfiles.getDictFilesParam())
+        self.OLVlocal_acts.SetObjects(fileProcessing.getDictFilesParam())
         #Добавление списка актов в сайзер
         self.rightSSendActs.Add(self.OLVlocal_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
@@ -150,7 +148,7 @@ class MyFrame(wx.Frame):
 
 
     def refresh_list_acts(self, event):
-        self.OLVlocal_acts.SetObjects(getlistfiles.getDictFilesParam())
+        self.OLVlocal_acts.SetObjects(fileProcessing.getDictFilesParam())
 
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:

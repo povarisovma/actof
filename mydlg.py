@@ -21,7 +21,8 @@ class MyDlg(wx.Dialog):
                            flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
         self.folderactssizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        self.tc_actloc_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACTLOC, value=settings.get_local_acts_path_folder())
+        self.tc_actloc_path = wx.StaticText(self, id=ID_MD_PATHDIRACTLOC, style=wx.ST_ELLIPSIZE_START
+                                            , label=settings.get_local_acts_path_folder())
         self.folderactssizer.Add(self.tc_actloc_path, proportion=1)
         self.folderactssizer.Add(wx.Button(self, id=ID_MD_CHOSDIRLOC, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
 
@@ -30,7 +31,8 @@ class MyDlg(wx.Dialog):
                            flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
         self.folderactssizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.mainsizer.Add(self.folderactssizer2, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT, border=10)
-        self.tc_act_path = wx.TextCtrl(self, id=ID_MD_PATHDIRACT, value=settings.get_general_acts_path_folder())
+        self.tc_act_path = wx.StaticText(self, id=ID_MD_PATHDIRACT, style=wx.ST_ELLIPSIZE_START
+                                         , label=settings.get_general_acts_path_folder())
         self.folderactssizer2.Add(self.tc_act_path, proportion=1)
         self.folderactssizer2.Add(wx.Button(self, id=ID_MD_CHOSDIR, label='...'), flag=wx.EXPAND | wx.LEFT, border=10)
 
@@ -42,18 +44,18 @@ class MyDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.choosediracts, id=ID_MD_CHOSDIR)
 
     def choosediractsloc(self, event):
-        dlg = wx.DirDialog(self, message="Выберите папку расположения локальных актов", defaultPath=self.tc_actloc_path.GetValue())
+        dlg = wx.DirDialog(self, message="Выберите папку расположения локальных актов", defaultPath=self.tc_actloc_path.Label)
         res = dlg.ShowModal()
         if res == wx.ID_OK:
             print(dlg.GetPath())
-            self.tc_actloc_path.SetValue(dlg.GetPath())
+            self.tc_actloc_path.SetLabel(dlg.GetPath())
             settings.set_local_acts_path_folder_in_settings(dlg.GetPath() + "\\")
 
 
     def choosediracts(self, event):
-        dlg1 = wx.DirDialog(self, message="Выберите папку расположения общих актов", defaultPath=self.tc_act_path.GetValue())
+        dlg1 = wx.DirDialog(self, message="Выберите папку расположения общих актов", defaultPath=self.tc_act_path.Label)
         res = dlg1.ShowModal()
         if res == wx.ID_OK:
             print(dlg1.GetPath())
-            self.tc_act_path.SetValue(dlg1.GetPath())
+            self.tc_act_path.SetLabel(dlg1.GetPath())
             settings.set_general_acts_path_folder_in_settings(dlg1.GetPath() + "\\")

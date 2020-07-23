@@ -6,6 +6,7 @@ import win32com.client as com
 import shutil
 import re
 import settings
+import datetime
 
 
 def textforlist(textinput):
@@ -154,94 +155,24 @@ def createdocxnpdffiles(lst):
     create_pdf_file_from_docx(settings.get_local_acts_path_folder() + namefile)
     copy_files_to_general_folder(namefile)
 
-    #
-    # doc = docx.Document('template.docx')
-    #
-    #
-    #
-    #
-    # bottext = False
-    # textlist = lst
-    # AZSnum = get_from_bodylist_azsnum(lst)
-    # SSOnum = get_from_bodylist_ssonum(lst)
-    # ACTnum = get_number_act()
-    #
-    # now = datetime.datetime.now()
-    # nowdate = str(dt.ru_strftime("%d %B %Y" + ' г.', inflected=True))
-    # numline = 0
-    #
-    # for i in range(len(doc.paragraphs)):
-    #     if i == 0:
-    #         hd = doc.paragraphs[i]
-    #         hd.paragraph_format.space_after = Pt(10)
-    #         doc.paragraphs[i].text = 'АКТ № ' + ACTnum
-    #         doc.paragraphs[i].style = 'Normal'
-    #         doc.paragraphs[i].alignment = 1
-    #         doc.paragraphs[i].runs[0].bold = True
-    #         doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
-    #         doc.paragraphs[i].runs[0].font.size = Pt(14)
-    #         continue
-    #     if i == 1:
-    #         hd2 = doc.paragraphs[i]
-    #         hd2.paragraph_format.space_after = Pt(10)
-    #         doc.paragraphs[i].style = 'Normal'
-    #         doc.paragraphs[i].add_run('АЗС №' + AZSnum + '	ССО №' + SSOnum + '\t\t\t\t\t\t\t\t' + nowdate)
-    #         doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
-    #         doc.paragraphs[i].runs[0].font.size = Pt(12)
-    #         continue
-    #     if i > 1 and not bottext and numline < len(textlist):
-    #         p2 = doc.paragraphs[i]
-    #         run2 = p2.add_run('\t' + textlist[numline])
-    #
-    #         p2.paragraph_format.alignment = 3
-    #         if textlist[numline].find('В связи с чем') != -1:
-    #             bottext = True
-    #             p2.paragraph_format.space_before = Pt(0)
-    #             p2.paragraph_format.space_after = Pt(0)
-    #         else:
-    #             p2.paragraph_format.space_before = Pt(0)
-    #             p2.paragraph_format.space_after = Pt(0)
-    #         p2.paragraph_format.line_spacing = Pt(0)
-    #         run2.font.name = 'Times New Roman'
-    #         run2.font.size = Pt(12)
-    #         numline += 1
-    #         continue
-    #     if i > 1 and bottext and numline < len(textlist):
-    #         p3 = doc.paragraphs[i]
-    #         doc.paragraphs[i].style = 'List Paragraph'
-    #         run3 = p3.add_run('— ' + textlist[numline])
-    #         run3.font.name = 'Times New Roman'
-    #         run3.font.size = Pt(12)
-    #         p3.paragraph_format.left_indent = Inches(0.8)
-    #         p3.paragraph_format.alignment = 0
-    #         p3.paragraph_format.line_spacing = Pt(0)
-    #         p3.paragraph_format.space_before = Pt(0)
-    #         p3.paragraph_format.space_after = Pt(0)
-    #         numline += 1
-    #         continue
 
-    # del_empty_paragraphs(doc, textlist)
+def getDictFilesParam():
+    path = 'local_acts'
+    generallist = []
+    filelist = os.listdir(path)
+    if filelist:
+        pdflist = []
+        for i in filelist:
+            if '.pdf' in i:
+                pdflist.append(i)
 
-    # filenamedocx = 'local_acts\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.docx'
-    # filenamepdf = 'local_acts\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.pdf'
-    # endfiledocx = get_path() + '\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.docx'
-    # endfilepdf = get_path() + '\\' + 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.pdf'
+        # temppdflist = [os.path.join(path, file) for file in pdflist]
 
-    # doc.save(filenamedocx)
-    #
-    # wdFormatPDF = 17
-    #
-    # in_file = os.path.abspath(filenamedocx)
-    # out_file = os.path.abspath(filenamepdf)
-    #
-    #
-    # word = com.DispatchEx('word.application')
-    # doccon = word.Documents.Open(in_file)
-    # doccon.SaveAs(out_file, FileFormat=wdFormatPDF)
-    # doccon.Close()
-    # word.Quit()
-    #
-    #
-    # shutil.copyfile(filenamedocx, endfiledocx)
-    # shutil.copyfile(filenamepdf, endfilepdf)
-    # return 'Акт' + ACTnum + '_' + 'АЗС' + AZSnum + '_' + 'ССО' + SSOnum + '.pdf'
+        # for file in temppdflist:
+        #     print(datetime.datetime.fromtimestamp(os.path.getmtime(file)).strftime("%d-%m-%Y %H.%M.%S"))
+
+
+        for file in pdflist:
+            generallist.append({"title": file, "creating": datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(path, file))),
+                               "modifine": datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(path, file)))})
+    return generallist
