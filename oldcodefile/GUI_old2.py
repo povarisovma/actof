@@ -7,7 +7,7 @@ ID_LB_TMPL = 45
 ID_TC_WTEXT = 26
 
 tmpllist = []
-filelist = os.listdir('.\\template')
+filelist = os.listdir('../template')
 print(filelist)
 for file in filelist:
     with open('.\\template\\' + file, 'r', encoding='utf-8') as f:
