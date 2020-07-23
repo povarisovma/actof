@@ -6,6 +6,7 @@ import os
 import settings
 import mydlg
 from ObjectListView import ObjectListView, ColumnDefn
+import datetime
 
 ID_BTN_CRARCT = 15
 ID_BTN_SENDACT = 25
@@ -153,7 +154,10 @@ class MyFrame(wx.Frame):
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
+            # threading.Thread(target=fileProcessing.createdocxnpdffiles, args=[txtlst]).start()
+            start_time = datetime.datetime.now()
             fileProcessing.createdocxnpdffiles(txtlst)
+            print(datetime.datetime.now() - start_time)
             self.refresh_list_acts(event)
 
     def sendActOn(self, event):

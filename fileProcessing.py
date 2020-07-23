@@ -7,6 +7,7 @@ import shutil
 import re
 import settings
 import datetime
+import threading
 
 
 def textforlist(textinput):
@@ -151,9 +152,13 @@ def copy_files_to_general_folder(filenamedocx):
 
 
 def createdocxnpdffiles(lst):
+    print("start thread")
     namefile = create_docx_file_from_bodylist(lst)
     create_pdf_file_from_docx(settings.get_local_acts_path_folder() + namefile)
     copy_files_to_general_folder(namefile)
+    print("stop thread")
+
+
 
 
 def getDictFilesParam():
@@ -176,3 +181,96 @@ def getDictFilesParam():
             generallist.append({"title": file, "creating": datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(path, file))),
                                "modifine": datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(path, file)))})
     return generallist
+
+
+#--------------------------------------------------text
+
+
+def create_docx_file_from_bodylist2(blist, AZSnum, SSOnum, ACTnum, docxpath):
+    doc = docx.Document('template.docx')
+
+
+    nowdate = get_current_date()
+    bottext = False
+    numline = 0
+
+    for i in range(len(doc.paragraphs)):
+        if i == 0:
+            hd = doc.paragraphs[i]
+            hd.paragraph_format.space_after = Pt(10)
+            doc.paragraphs[i].text = 'АКТ № ' + ACTnum
+            doc.paragraphs[i].style = 'Normal'
+            doc.paragraphs[i].alignment = 1
+            doc.paragraphs[i].runs[0].bold = True
+            doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
+            doc.paragraphs[i].runs[0].font.size = Pt(14)
+            continue
+        if i == 1:
+            hd2 = doc.paragraphs[i]
+            hd2.paragraph_format.space_after = Pt(10)
+            doc.paragraphs[i].style = 'Normal'
+            doc.paragraphs[i].add_run('АЗС №' + AZSnum + '	ССО №' + SSOnum + '\t\t\t\t\t\t\t\t' + nowdate)
+            doc.paragraphs[i].runs[0].font.name = 'Times New Roman'
+            doc.paragraphs[i].runs[0].font.size = Pt(12)
+            continue
+        if i > 1 and not bottext and numline < len(blist):
+            p2 = doc.paragraphs[i]
+            run2 = p2.add_run('\t' + blist[numline])
+            p2.paragraph_format.alignment = 3
+            if blist[numline].find('В связи с чем') != -1:
+                bottext = True
+                p2.paragraph_format.space_before = Pt(0)
+                p2.paragraph_format.space_after = Pt(0)
+            else:
+                p2.paragraph_format.space_before = Pt(0)
+                p2.paragraph_format.space_after = Pt(0)
+            p2.paragraph_format.line_spacing = Pt(0)
+            run2.font.name = 'Times New Roman'
+            run2.font.size = Pt(12)
+            numline += 1
+            continue
+        if i > 1 and bottext and numline < len(blist):
+            p3 = doc.paragraphs[i]
+            doc.paragraphs[i].style = 'List Paragraph'
+            run3 = p3.add_run('— ' + blist[numline])
+            run3.font.name = 'Times New Roman'
+            run3.font.size = Pt(12)
+            p3.paragraph_format.left_indent = Inches(0.8)
+            p3.paragraph_format.alignment = 0
+            p3.paragraph_format.line_spacing = Pt(0)
+            p3.paragraph_format.space_before = Pt(0)
+            p3.paragraph_format.space_after = Pt(0)
+            numline += 1
+            continue
+    del_empty_paragraphs(doc, blist)
+    doc.save(docxpath)
+
+
+def create_pdf_file_from_docx2(filenamedocx):
+    wdFormatPDF = 17
+    out_file = filenamedocx.strip(".docx")
+    word = com.DispatchEx('word.application')
+    doccon = word.Documents.Open(filenamedocx)
+    doccon.SaveAs(out_file, FileFormat=wdFormatPDF)
+    doccon.Close()
+    word.Quit()
+
+def copy_files_to_general_folder2(docxpath, docxpathgen, pdfpath, pdfpathgen):
+    shutil.copyfile(docxpath, docxpathgen)
+    shutil.copyfile(pdfpath, pdfpathgen)
+
+
+def createdocxnpdffiles2(lst):
+    AZSnum = get_from_bodylist_azsnum(lst)
+    SSOnum = get_from_bodylist_ssonum(lst)
+    ACTnum = get_number_act()
+    filenamedocx = f"Акт{ACTnum}_АЗС{AZSnum}_ССО{SSOnum}.docx"
+    filenamepdf = filenamedocx.strip(".docx") + ".pdf"
+    docxpath = settings.get_local_acts_path_folder() + filenamedocx
+    docxpathgen = settings.get_general_acts_path_folder() + filenamedocx
+    pdfpath = settings.get_local_acts_path_folder() + filenamepdf
+    pdfpathgen = settings.get_general_acts_path_folder() + filenamepdf
+
+    create_docx_file_from_bodylist2(lst, AZSnum, SSOnum, ACTnum, docxpath)
+    create_pdf_file_from_docx2(docxpath)
+    copy_files_to_general_folder2(docxpath, docxpathgen, pdfpath, pdfpathgen)
