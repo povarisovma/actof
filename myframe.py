@@ -97,7 +97,7 @@ class MyFrame(wx.Frame):
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
         #Добавление в список актов из папки locals_act
-        self.OLVlocal_acts.SetObjects(fileProcessing.getDictFilesParam())
+        self.OLVlocal_acts.SetObjects(fileProcessing.get_listdir_pdf_files_in_dict(settings.get_local_acts_path_folder()))
         #Добавление списка актов в сайзер
         self.rightSSendActs.Add(self.OLVlocal_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
@@ -114,10 +114,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.refresh_list_acts, id=ID_BTN_REFLACT)
 
     def onSettings(self, event):
-        print("open settings")
         with mydlg.MyDlg(self, title="Настройки") as dlg:
             res = dlg.ShowModal()
-        print(res, wx.ID_CANCEL)
 
     def onQuit(self, event):
         self.Close()
@@ -147,16 +145,15 @@ class MyFrame(wx.Frame):
                         os.remove(pathpdf)
                         self.refresh_list_acts(event)
 
-
     def refresh_list_acts(self, event):
-        self.OLVlocal_acts.SetObjects(fileProcessing.getDictFilesParam())
+        self.OLVlocal_acts.SetObjects(fileProcessing.get_listdir_pdf_files_in_dict(settings.get_local_acts_path_folder()))
 
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
             # threading.Thread(target=fileProcessing.createdocxnpdffiles, args=[txtlst]).start()
             start_time = datetime.datetime.now()
-            fileProcessing.createdocxnpdffiles(txtlst)
+            fileProcessing.create_docx_and_pdf_files(txtlst)
             print(datetime.datetime.now() - start_time)
             self.refresh_list_acts(event)
 
