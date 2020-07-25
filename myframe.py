@@ -5,6 +5,7 @@ import re
 import os
 import settings
 import mydlg
+import aboutdlg
 from ObjectListView import ObjectListView, ColumnDefn
 import datetime
 
@@ -127,10 +128,11 @@ class MyFrame(wx.Frame):
         os.startfile(os.path.realpath(settings.get_general_acts_path_folder()))
 
     def openDocxTemplate(self, event):
-        print("open docx template")
+        os.startfile(os.path.realpath(settings.get_docx_templ_path()))
 
     def about(self, event):
-        print("open about")
+        with aboutdlg.AboutDlg(self, title="Настройки") as dlg:
+            res = dlg.ShowModal()
 
     def del_acts_action(self, event):
         if event.GetId() == ID_BTN_DELACT:
