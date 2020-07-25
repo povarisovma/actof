@@ -56,6 +56,10 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.about, id=ID_MB_ABOUT)
 
 
+        #Создание панели:
+        panel = wx.Panel(self)
+
+
         #Объявление сайзеров------------------------------------------------------------------------
         #Главный сайзер программы:
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -65,22 +69,26 @@ class MyFrame(wx.Frame):
         self.rightSSendActs = wx.BoxSizer(wx.VERTICAL)
         self.rightSSendActsTopBTN = wx.BoxSizer(wx.HORIZONTAL)
 
+
         #Центральная часть программы, поле для ввода текста и кнопка создать акт:
         #Основное окно, создание кнопки "Создать Акт" и поля для текстового ввода:
-        self.BTNCreateActCS = wx.Button(self, id=ID_BTN_CRARCT, label=u"Создать Акт")
-        self.TCTextInputCS = wx.TextCtrl(self,
+        self.BTNCreateActCS = wx.Button(panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
+        self.TCTextInputCS = wx.TextCtrl(panel,
                                          wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE)
+        self.font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
+        self.TCTextInputCS.SetFont(self.font)
         # Добавление кнопки "Создать Акт" и поле текстового ввода в центральный сайзер:
         self.centrSCreateActs.Add(self.BTNCreateActCS, 0, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
         self.centrSCreateActs.Add(self.TCTextInputCS, 1, wx.ALL | wx.EXPAND, 5)
         #Добавление центрального сайзера в главный сайзер:
         self.mainSizer.Add(self.centrSCreateActs, proportion=1, flag=wx.EXPAND, border=5)
 
+
         #Правая часть программы, список созданных актов и кнопки для работы с ними:
         #Создание и добавление кнопок в сайзер:
-        self.send_actBTN = wx.Button(self, id=ID_BTN_SENDACT, label="Отправить Акт")
-        self.del_actBTN = wx.Button(self, id=ID_BTN_DELACT, label="Удалить файлы")
-        self.refresh_lactsBTN = wx.Button(self, id=ID_BTN_REFLACT, label="Обновить список")
+        self.send_actBTN = wx.Button(panel, id=ID_BTN_SENDACT, label="Отправить Акт")
+        self.del_actBTN = wx.Button(panel, id=ID_BTN_DELACT, label="Удалить файлы")
+        self.refresh_lactsBTN = wx.Button(panel, id=ID_BTN_REFLACT, label="Обновить список")
         self.rightSSendActsTopBTN.Add(self.send_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rightSSendActsTopBTN.Add(self.del_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rightSSendActsTopBTN.Add(self.refresh_lactsBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
@@ -88,7 +96,7 @@ class MyFrame(wx.Frame):
         self.rightSSendActs.Add(self.rightSSendActsTopBTN, proportion=0, flag=wx.EXPAND)
 
         #Создание списка актов
-        self.OLVlocal_acts = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+        self.OLVlocal_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
         title = ColumnDefn("Title", "left", 220, "title", isSpaceFilling=False)
         creating = ColumnDefn("Date Creating", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S",
@@ -106,7 +114,7 @@ class MyFrame(wx.Frame):
         self.mainSizer.Add(self.rightSSendActs, proportion=0, flag=wx.EXPAND)
 
         #Назначение главного сайзера
-        self.SetSizer(self.mainSizer)
+        panel.SetSizer(self.mainSizer)
 
         #Назначение событий
         self.Bind(wx.EVT_BUTTON, self.createActOn, id=ID_BTN_CRARCT)
