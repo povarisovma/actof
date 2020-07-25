@@ -98,10 +98,10 @@ class MyFrame(wx.Frame):
         #Создание списка актов
         self.OLVlocal_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
-        title = ColumnDefn("Title", "left", 220, "title", isSpaceFilling=False)
-        creating = ColumnDefn("Date Creating", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S",
+        title = ColumnDefn("Имя", "left", 220, "title", isSpaceFilling=False)
+        creating = ColumnDefn("Дата создания", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S",
                               isSpaceFilling=False)
-        modifine = ColumnDefn("Date Modifine", "left", 130, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S",
+        modifine = ColumnDefn("Дата изменения", "left", 130, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S",
                               isSpaceFilling=False)
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
