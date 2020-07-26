@@ -82,8 +82,22 @@ def get_listdir_pdf_files_in_dict(path):
     return generallist
 
 
+def get_listdir_docx_files_in_dict(path):
+    generallist = []
+    filelist = os.listdir(path)
+    if filelist:
+        docxlist = []
+        for i in filelist:
+            if '.docx' in i:
+                docxlist.append(i)
+        for file in docxlist:
+            generallist.append({"title": file, "creating": datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(path, file))),
+                               "modifine": datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(path, file)))})
+    return generallist
+
+
 def create_docx_file_from_bodylist(blist, AZSnum, SSOnum, ACTnum, docxpath):
-    doc = docx.Document('template.docx')
+    doc = docx.Document(settings.get_docx_templ_path())
     nowdate = get_current_date()
     bottext = False
     numline = 0
@@ -140,19 +154,27 @@ def create_docx_file_from_bodylist(blist, AZSnum, SSOnum, ACTnum, docxpath):
     doc.save(docxpath)
 
 
-def create_pdf_file_from_docx(filenamedocx):
+def create_pdf_file_from_docx(docxpath):
     wdFormatPDF = 17
-    out_file = filenamedocx.strip(".docx")
+    out_file = docxpath.strip(".docx")
     word = com.DispatchEx('word.application')
-    doccon = word.Documents.Open(filenamedocx)
+    doccon = word.Documents.Open(docxpath)
     doccon.SaveAs(out_file, FileFormat=wdFormatPDF)
     doccon.Close()
     word.Quit()
 
 
+def get_path_to_file_to_string(filename):
+    return settings.get_local_acts_path_folder() + filename
+
+
+def get_name_pdf_from_docx(filenamedocx):
+    return filenamedocx.strip(".docx") + ".pdf"
+
+
 def copy_files_to_general_folder(filenamedocx):
-    docxpath = settings.get_local_acts_path_folder() + filenamedocx
-    filenamepdf = filenamedocx.strip(".docx") + ".pdf"
+    docxpath = get_path_to_file_to_string(filenamedocx)
+    filenamepdf = get_name_pdf_from_docx(filenamedocx)
     docxpathgen = settings.get_general_acts_path_folder() + filenamedocx
     pdfpath = settings.get_local_acts_path_folder() + filenamepdf
     pdfpathgen = settings.get_general_acts_path_folder() + filenamepdf

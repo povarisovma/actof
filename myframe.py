@@ -1,6 +1,8 @@
 import wx
 import fileProcessing
+
 import win32com.client
+import subprocess
 import re
 import os
 import settings
@@ -13,6 +15,9 @@ ID_BTN_CRARCT = 15
 ID_BTN_SENDACT = 25
 ID_BTN_DELACT = 26
 ID_BTN_REFLACT = 27
+ID_BTN_OPENDOCX = 28
+ID_BTN_RECOPYACT = 29
+ID_BTN_COPYPDFBUFF = 30
 ID_LC_ACTLIST = 35
 ID_MB_EXIT = 41
 ID_MB_OPENDOCX = 42
@@ -58,7 +63,8 @@ class MyFrame(wx.Frame):
 
         #Создание панели:
         panel = wx.Panel(self)
-
+        self.font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Montserrat')
+        panel.SetFont(self.font)
 
         #Объявление сайзеров------------------------------------------------------------------------
         #Главный сайзер программы:
@@ -68,6 +74,7 @@ class MyFrame(wx.Frame):
         #Правая часть: Сайзеры для отправки актов(горизонтальный для добавления кнопок):
         self.rightSSendActs = wx.BoxSizer(wx.VERTICAL)
         self.rightSSendActsTopBTN = wx.BoxSizer(wx.HORIZONTAL)
+        self.rSizerfileworkBTN = wx.BoxSizer(wx.HORIZONTAL)
 
 
         #Центральная часть программы, поле для ввода текста и кнопка создать акт:
@@ -75,8 +82,8 @@ class MyFrame(wx.Frame):
         self.BTNCreateActCS = wx.Button(panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
         self.TCTextInputCS = wx.TextCtrl(panel,
                                          wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE)
-        self.font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
-        self.TCTextInputCS.SetFont(self.font)
+        self.fontTC = wx.Font(15, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
+        self.TCTextInputCS.SetFont(self.fontTC)
         # Добавление кнопки "Создать Акт" и поле текстового ввода в центральный сайзер:
         self.centrSCreateActs.Add(self.BTNCreateActCS, 0, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
         self.centrSCreateActs.Add(self.TCTextInputCS, 1, wx.ALL | wx.EXPAND, 5)
@@ -93,20 +100,31 @@ class MyFrame(wx.Frame):
         self.rightSSendActsTopBTN.Add(self.del_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rightSSendActsTopBTN.Add(self.refresh_lactsBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
+        self.open_docx_BTN = wx.Button(panel, id=ID_BTN_OPENDOCX, label="Открыть docx")
+        self.recopy_act_BTN = wx.Button(panel, id=ID_BTN_RECOPYACT, label="Коп. в папку Актов")
+        self.copy_pdf_inbufferBTN = wx.Button(panel, id=ID_BTN_COPYPDFBUFF, label="Коп. pdf в буфер")
+        self.rSizerfileworkBTN.Add(self.open_docx_BTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
+        self.rSizerfileworkBTN.Add(self.recopy_act_BTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
+        self.rSizerfileworkBTN.Add(self.copy_pdf_inbufferBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
+
         self.rightSSendActs.Add(self.rightSSendActsTopBTN, proportion=0, flag=wx.EXPAND)
+        self.rightSSendActs.Add(self.rSizerfileworkBTN, proportion=0, flag=wx.EXPAND)
 
         #Создание списка актов
         self.OLVlocal_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
-        title = ColumnDefn("Имя", "left", 220, "title", isSpaceFilling=False)
+        title = ColumnDefn("Имя", "left", 240, "title", isSpaceFilling=False)
         creating = ColumnDefn("Дата создания", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S",
                               isSpaceFilling=False)
         modifine = ColumnDefn("Дата изменения", "left", 130, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S",
                               isSpaceFilling=False)
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
+        self.fontOLV = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Roboto')
+        self.OLVlocal_acts.SetFont(self.fontOLV)
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
         #Добавление в список актов из папки locals_act
-        self.OLVlocal_acts.SetObjects(fileProcessing.get_listdir_pdf_files_in_dict(settings.get_local_acts_path_folder()))
+        self.OLVlocal_acts.SetObjects(
+            fileProcessing.get_listdir_docx_files_in_dict(settings.get_local_acts_path_folder()))
         #Добавление списка актов в сайзер
         self.rightSSendActs.Add(self.OLVlocal_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
@@ -121,10 +139,43 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.sendActOn, id=ID_BTN_SENDACT)
         self.Bind(wx.EVT_BUTTON, self.del_acts_action, id=ID_BTN_DELACT)
         self.Bind(wx.EVT_BUTTON, self.refresh_list_acts, id=ID_BTN_REFLACT)
+        self.Bind(wx.EVT_BUTTON, self.open_docx, id=ID_BTN_OPENDOCX)
+        self.Bind(wx.EVT_BUTTON, self.recopy_file_in_general, id=ID_BTN_RECOPYACT)
+        self.Bind(wx.EVT_BUTTON, self.copy_pdf_in_clipboard, id=ID_BTN_COPYPDFBUFF)
+
+    def copy_pdf_in_clipboard(self, event):
+        if event.GetId() == ID_BTN_COPYPDFBUFF:
+            selection = self.OLVlocal_acts.GetSelectedObjects()
+            if selection:
+                for i in range(len(selection)):
+                    path = fileProcessing.get_path_to_file_to_string(
+                        fileProcessing.get_name_pdf_from_docx(selection[i]['title']))
+                    print(path)
+                    if i == 0:
+                        proc = subprocess.Popen(['powershell', f'Set-Clipboard -Path {path}'])
+                        proc.wait()
+                    else:
+                        proc = subprocess.Popen(['powershell', f'Set-Clipboard -Append -Path {path}'])
+                        proc.wait()
+
+    def recopy_file_in_general(self, event):
+        if event.GetId() == ID_BTN_RECOPYACT:
+            selection = self.OLVlocal_acts.GetSelectedObjects()
+            if selection:
+                for i in range(len(selection)):
+                    fileProcessing.create_pdf_file_from_docx(fileProcessing.get_path_to_file_to_string(
+                        selection[i]['title']))
+                    fileProcessing.copy_files_to_general_folder(selection[i]['title'])
+
+    def open_docx(self, event):
+        if event.GetId() == ID_BTN_OPENDOCX:
+            selection = self.OLVlocal_acts.GetSelectedObjects()
+            if selection:
+                os.startfile(os.path.realpath(settings.get_local_acts_path_folder()) + '\\' + selection[0]['title'])
 
     def onSettings(self, event):
         with mydlg.MyDlg(self, title="Настройки") as dlg:
-            res = dlg.ShowModal()
+            dlg.ShowModal()
 
     def onQuit(self, event):
         self.Close()
@@ -140,7 +191,7 @@ class MyFrame(wx.Frame):
 
     def about(self, event):
         with aboutdlg.AboutDlg(self, title="Настройки") as dlg:
-            res = dlg.ShowModal()
+            dlg.ShowModal()
 
     def del_acts_action(self, event):
         if event.GetId() == ID_BTN_DELACT:
@@ -149,19 +200,18 @@ class MyFrame(wx.Frame):
                 dlg = wx.MessageBox('Удалить выбранные файлы?', 'Подтверждение', wx.YES_NO | wx.NO_DEFAULT, self)
                 if dlg == wx.YES:
                     for i in range(len(selection)):
-                        pathdocx = os.path.abspath('local_acts') + '\\' + selection[i]['title'].rstrip('pdf') + 'docx'
-                        pathpdf = os.path.abspath('local_acts') + '\\' + selection[i]['title']
+                        pathdocx = os.path.abspath('local_acts') + '\\' + selection[i]['title']
+                        pathpdf = os.path.abspath('local_acts') + '\\' + selection[i]['title'].rstrip('docx') + 'pdf'
                         os.remove(pathdocx)
                         os.remove(pathpdf)
                         self.refresh_list_acts(event)
 
     def refresh_list_acts(self, event):
-        self.OLVlocal_acts.SetObjects(fileProcessing.get_listdir_pdf_files_in_dict(settings.get_local_acts_path_folder()))
+        self.OLVlocal_acts.SetObjects(fileProcessing.get_listdir_docx_files_in_dict(settings.get_local_acts_path_folder()))
 
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
-            # threading.Thread(target=fileProcessing.createdocxnpdffiles, args=[txtlst]).start()
             start_time = datetime.datetime.now()
             fileProcessing.create_docx_and_pdf_files(txtlst)
             print(datetime.datetime.now() - start_time)
@@ -192,7 +242,7 @@ class MyFrame(wx.Frame):
                 index = mess.HTMLbody.find('>', mess.HTMLbody.find('<body'))
                 mess.HTMLbody = mess.HTMLbody[:index + 1] + bodiez + mess.HTMLbody[index + 1:]
                 for i in range(len(selection)):
-                    path = os.path.abspath('local_acts') + '\\' + selection[i]['title']
+                    path = os.path.abspath('local_acts') + '\\' + selection[i]['title'].strip(".docx") + "pdf"
                     mess.Attachments.Add(path)
                 print('Отправка письма')
                 mess.Display(True)
