@@ -9,7 +9,6 @@ import settings
 import mydlg
 import aboutdlg
 from ObjectListView import ObjectListView, ColumnDefn
-import datetime
 
 ID_BTN_CRARCT = 15
 ID_BTN_SENDACT = 25
@@ -25,6 +24,14 @@ ID_MB_SETTINGS = 43
 ID_MB_OPENFOLDERLOCAL = 51
 ID_MB_OPENFOLDERREPO = 52
 ID_MB_ABOUT = 61
+ID_BTN_ACTNUM = 71
+ID_TC_ACTNUM = 72
+ID_BTN_AZSNUM = 73
+ID_TC_AZSNUM = 74
+ID_BTN_SSONUM = 75
+ID_TC_SSONUM = 76
+ID_BTN_DATEINP = 77
+ID_TC_DATEINP = 78
 
 
 class MyFrame(wx.Frame):
@@ -69,8 +76,10 @@ class MyFrame(wx.Frame):
         #Объявление сайзеров------------------------------------------------------------------------
         #Главный сайзер программы:
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
-        #Центральная часть(CA = CREATE ACTS): сайзер для создания актов:
+        #Центральная часть сайзеры для создания актов:
         self.centrSCreateActs = wx.BoxSizer(wx.VERTICAL)
+        self.centrSActNumDef = wx.BoxSizer(wx.HORIZONTAL)
+        self.centrSAZSSSONumDef = wx.BoxSizer(wx.HORIZONTAL)
         #Правая часть: Сайзеры для отправки актов(горизонтальный для добавления кнопок):
         self.rightSSendActs = wx.BoxSizer(wx.VERTICAL)
         self.rightSSendActsTopBTN = wx.BoxSizer(wx.HORIZONTAL)
@@ -78,14 +87,57 @@ class MyFrame(wx.Frame):
 
 
         #Центральная часть программы, поле для ввода текста и кнопка создать акт:
-        #Основное окно, создание кнопки "Создать Акт" и поля для текстового ввода:
+        #Создание кнопки "Создать Акт":
         self.BTNCreateActCS = wx.Button(panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
+        #Определение шрифтов:
+        self.fontSTactNum = wx.Font(15, wx.MODERN, wx.NORMAL, wx.BOLD, False, u'Times New Roman')
+        self.fontBodyAct = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
+        #Создание заголовка "Акт №" + поле ввода акта + кнопка обновить:
+        self.BTNactNum = wx.Button(panel, ID_BTN_ACTNUM, label="Акт №")
+        self.BTNactNum.SetFont(self.fontSTactNum)
+
+        self.TCActNumDef = wx.TextCtrl(panel, ID_TC_ACTNUM, wx.EmptyString, wx.DefaultPosition, size=(85, -1))
+        self.TCActNumDef.SetFont(self.fontSTactNum)
+
+        #Создание шапки документа номер АЗС номер ССО по аналогии с номером акта, текущая дата:
+        self.BTNAZSnum = wx.Button(panel, ID_BTN_AZSNUM, label="АЗС №")
+        self.BTNAZSnum.SetFont(self.fontBodyAct)
+
+        self.TCAZSNumDef = wx.TextCtrl(panel, ID_TC_AZSNUM, wx.EmptyString, wx.DefaultPosition, size=(65, -1))
+        self.TCAZSNumDef.SetFont(self.fontBodyAct)
+
+        self.BTNSSOnum = wx.Button(panel, ID_BTN_SSONUM, label="ССО №")
+        self.BTNSSOnum.SetFont(self.fontBodyAct)
+
+        self.TCSSONumDef = wx.TextCtrl(panel, ID_TC_SSONUM, wx.EmptyString, wx.DefaultPosition, size=(65, -1))
+        self.TCSSONumDef.SetFont(self.fontBodyAct)
+
+        self.BTNdatenum = wx.Button(panel, ID_BTN_DATEINP, label="Дата")
+        self.BTNdatenum.SetFont(self.fontBodyAct)
+
+        self.TCdateNumDef = wx.TextCtrl(panel, ID_TC_DATEINP, wx.EmptyString, wx.DefaultPosition, size=(150, -1))
+        self.TCdateNumDef.SetFont(self.fontBodyAct)
+
+        #Создание текстового поля ввода текста акта:
         self.TCTextInputCS = wx.TextCtrl(panel,
                                          wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE)
-        self.fontTC = wx.Font(15, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
-        self.TCTextInputCS.SetFont(self.fontTC)
-        # Добавление кнопки "Создать Акт" и поле текстового ввода в центральный сайзер:
+        self.TCTextInputCS.SetFont(self.fontBodyAct)
+
+        #Добавление виджетов номера акта в сайзер определения акта:
+        self.centrSActNumDef.Add(self.BTNactNum)
+        self.centrSActNumDef.Add(self.TCActNumDef)
+
+        self.centrSAZSSSONumDef.Add(self.BTNAZSnum)
+        self.centrSAZSSSONumDef.Add(self.TCAZSNumDef)
+        self.centrSAZSSSONumDef.Add(self.BTNSSOnum, flag=wx.LEFT, border=5)
+        self.centrSAZSSSONumDef.Add(self.TCSSONumDef)
+        self.centrSAZSSSONumDef.Add(self.BTNdatenum, flag=wx.LEFT, border=5)
+        self.centrSAZSSSONumDef.Add(self.TCdateNumDef)
+        # Добавление всех элементов в центральный сайзер:
         self.centrSCreateActs.Add(self.BTNCreateActCS, 0, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
+        self.centrSCreateActs.Add(self.centrSActNumDef, proportion=0, flag=wx.TOP | wx.LEFT | wx.RIGHT |
+                                                                           wx.ALIGN_CENTER, border=5)
+        self.centrSCreateActs.Add(self.centrSAZSSSONumDef, proportion=0, flag=wx.TOP | wx.LEFT | wx.RIGHT, border=5)
         self.centrSCreateActs.Add(self.TCTextInputCS, 1, wx.ALL | wx.EXPAND, 5)
         #Добавление центрального сайзера в главный сайзер:
         self.mainSizer.Add(self.centrSCreateActs, proportion=1, flag=wx.EXPAND, border=5)
@@ -142,6 +194,32 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.open_docx, id=ID_BTN_OPENDOCX)
         self.Bind(wx.EVT_BUTTON, self.recopy_file_in_general, id=ID_BTN_RECOPYACT)
         self.Bind(wx.EVT_BUTTON, self.copy_pdf_in_clipboard, id=ID_BTN_COPYPDFBUFF)
+        self.Bind(wx.EVT_BUTTON, self.act_num_refresh, id=ID_BTN_ACTNUM)
+        self.Bind(wx.EVT_BUTTON, self.azs_num_refresh, id=ID_BTN_AZSNUM)
+        self.Bind(wx.EVT_BUTTON, self.sso_num_refresh, id=ID_BTN_SSONUM)
+        self.Bind(wx.EVT_BUTTON, self.current_data_refresh, id=ID_BTN_DATEINP)
+
+    def current_data_refresh(self, event):
+        if event.GetId() == ID_BTN_DATEINP:
+            self.TCdateNumDef.SetLabel(fileProcessing.get_current_date())
+
+    def sso_num_refresh(self, event):
+        if event.GetId() == ID_BTN_SSONUM:
+            txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
+            if self.TCTextInputCS.GetValue():
+                if fileProcessing.get_from_bodylist_ssonum(txtlst):
+                    self.TCSSONumDef.SetLabel(fileProcessing.get_from_bodylist_ssonum(txtlst))
+
+    def azs_num_refresh(self, event):
+        if event.GetId() == ID_BTN_AZSNUM:
+            txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
+            if self.TCTextInputCS.GetValue():
+                if fileProcessing.get_from_bodylist_azsnum(txtlst):
+                    self.TCAZSNumDef.SetLabel(fileProcessing.get_from_bodylist_azsnum(txtlst))
+
+    def act_num_refresh(self, event):
+        if event.GetId() == ID_BTN_ACTNUM:
+            self.TCActNumDef.SetLabel(fileProcessing.get_number_act())
 
     def copy_pdf_in_clipboard(self, event):
         if event.GetId() == ID_BTN_COPYPDFBUFF:
@@ -200,10 +278,10 @@ class MyFrame(wx.Frame):
                 dlg = wx.MessageBox('Удалить выбранные файлы?', 'Подтверждение', wx.YES_NO | wx.NO_DEFAULT, self)
                 if dlg == wx.YES:
                     for i in range(len(selection)):
-                        pathdocx = os.path.abspath('local_acts') + '\\' + selection[i]['title']
-                        pathpdf = os.path.abspath('local_acts') + '\\' + selection[i]['title'].rstrip('docx') + 'pdf'
-                        os.remove(pathdocx)
-                        os.remove(pathpdf)
+                        os.remove(fileProcessing.get_path_to_file_to_string(selection[i]['title']))
+                        os.remove(fileProcessing.get_path_to_file_to_string(
+                            fileProcessing.get_name_pdf_from_docx(selection[i]['title'])
+                        ))
                         self.refresh_list_acts(event)
 
     def refresh_list_acts(self, event):
@@ -212,9 +290,13 @@ class MyFrame(wx.Frame):
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
-            start_time = datetime.datetime.now()
-            fileProcessing.create_docx_and_pdf_files(txtlst)
-            print(datetime.datetime.now() - start_time)
+            fileProcessing.create_docx_and_pdf_files(
+                txtlst,
+                self.TCActNumDef.GetValue(),
+                self.TCAZSNumDef.GetValue(),
+                self.TCSSONumDef.GetValue(),
+                self.TCdateNumDef.GetValue()
+            )
             self.refresh_list_acts(event)
 
     def sendActOn(self, event):
@@ -242,8 +324,11 @@ class MyFrame(wx.Frame):
                 index = mess.HTMLbody.find('>', mess.HTMLbody.find('<body'))
                 mess.HTMLbody = mess.HTMLbody[:index + 1] + bodiez + mess.HTMLbody[index + 1:]
                 for i in range(len(selection)):
-                    path = os.path.abspath('local_acts') + '\\' + selection[i]['title'].strip(".docx") + "pdf"
-                    mess.Attachments.Add(path)
+                    mess.Attachments.Add(
+                        fileProcessing.get_path_to_file_to_string(
+                            fileProcessing.get_name_pdf_from_docx(selection[i]['title'])
+                        )
+                    )
                 print('Отправка письма')
                 mess.Display(True)
                 print('Письмо отправлено')

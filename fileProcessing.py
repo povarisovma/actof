@@ -23,21 +23,27 @@ def delete_paragraph(paragraph):
 
 
 def get_from_bodylist_azsnum(blist):
-    for i in range(len(blist[0].split())):
-        if 'АЗС' in blist[0].split()[i]:
-            if re.sub("\\D", "", blist[0].split()[i + 1]).isdigit():
-                return re.sub("\\D", "", blist[0].split()[i + 1])
-            elif re.sub("\\D", "", blist[0].split()[i + 2]).isdigit():
-                return re.sub("\\D", "", blist[0].split()[i + 2])
+    if isinstance(blist, list):
+        for i in range(len(blist[0].split())):
+            if 'АЗС' in blist[0].split()[i]:
+                if re.sub("\\D", "", blist[0].split()[i + 1]).isdigit():
+                    return re.sub("\\D", "", blist[0].split()[i + 1])
+                elif re.sub("\\D", "", blist[0].split()[i + 2]).isdigit():
+                    return re.sub("\\D", "", blist[0].split()[i + 2])
+        else:
+            return ""
 
 
 def get_from_bodylist_ssonum(blist):
-    for i in range(len(blist[0].split())):
-        if 'ССО' in blist[0].split()[i]:
-            if re.sub("\\D", "", blist[0].split()[i + 1]).isdigit():
-                return re.sub("\\D", "", blist[0].split()[i + 1])
-            elif re.sub("\\D", "", blist[0].split()[i + 2]).isdigit():
-                return re.sub("\\D", "", blist[0].split()[i + 2])
+    if isinstance(blist, list):
+        for i in range(len(blist[0].split())):
+            if 'ССО' in blist[0].split()[i]:
+                if re.sub("\\D", "", blist[0].split()[i + 1]).isdigit():
+                    return re.sub("\\D", "", blist[0].split()[i + 1])
+                elif re.sub("\\D", "", blist[0].split()[i + 2]).isdigit():
+                    return re.sub("\\D", "", blist[0].split()[i + 2])
+        else:
+            return ""
 
 
 def del_empty_paragraphs(doc, btext):
@@ -96,9 +102,9 @@ def get_listdir_docx_files_in_dict(path):
     return generallist
 
 
-def create_docx_file_from_bodylist(blist, AZSnum, SSOnum, ACTnum, docxpath):
+def create_docx_file_from_bodylist(blist, AZSnum, SSOnum, ACTnum, nowdate, docxpath):
     doc = docx.Document(settings.get_docx_templ_path())
-    nowdate = get_current_date()
+    nowdate = nowdate
     bottext = False
     numline = 0
 
@@ -182,12 +188,9 @@ def copy_files_to_general_folder(filenamedocx):
     shutil.copyfile(pdfpath, pdfpathgen)
 
 
-def create_docx_and_pdf_files(lst):
-    AZSnum = get_from_bodylist_azsnum(lst)
-    SSOnum = get_from_bodylist_ssonum(lst)
-    ACTnum = get_number_act()
+def create_docx_and_pdf_files(lst, ACTnum, AZSnum, SSOnum, nowdate):
     filenamedocx = f"Акт{ACTnum}_АЗС{AZSnum}_ССО{SSOnum}.docx"
     docxpath = settings.get_local_acts_path_folder() + filenamedocx
-    create_docx_file_from_bodylist(lst, AZSnum, SSOnum, ACTnum, docxpath)
+    create_docx_file_from_bodylist(lst, AZSnum, SSOnum, ACTnum, nowdate, docxpath)
     create_pdf_file_from_docx(docxpath)
     copy_files_to_general_folder(filenamedocx)
