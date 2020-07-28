@@ -10,7 +10,9 @@ import mydlg
 import aboutdlg
 from ObjectListView import ObjectListView, ColumnDefn
 
+ID_BTN_REFALL = 16
 ID_BTN_CRARCT = 15
+ID_BTN_CLEAR = 17
 ID_BTN_SENDACT = 25
 ID_BTN_DELACT = 26
 ID_BTN_REFLACT = 27
@@ -78,6 +80,7 @@ class MyFrame(wx.Frame):
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
         #Центральная часть сайзеры для создания актов:
         self.centrSCreateActs = wx.BoxSizer(wx.VERTICAL)
+        self.centrSCreateActsGeneral = wx.BoxSizer(wx.HORIZONTAL)
         self.centrSActNumDef = wx.BoxSizer(wx.HORIZONTAL)
         self.centrSAZSSSONumDef = wx.BoxSizer(wx.HORIZONTAL)
         #Правая часть: Сайзеры для отправки актов(горизонтальный для добавления кнопок):
@@ -87,8 +90,10 @@ class MyFrame(wx.Frame):
 
 
         #Центральная часть программы, поле для ввода текста и кнопка создать акт:
-        #Создание кнопки "Создать Акт":
+        #Создание кнопок "Обновить всё", "Создать Акт", "Очистить":
+        self.BTNrefreshAll = wx.Button(panel, id=ID_BTN_REFALL, label="Обновить всё")
         self.BTNCreateActCS = wx.Button(panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
+        self.BTNclearAll = wx.Button(panel, id=ID_BTN_CLEAR, label="Очистить")
         #Определение шрифтов:
         self.fontSTactNum = wx.Font(15, wx.MODERN, wx.NORMAL, wx.BOLD, False, u'Times New Roman')
         self.fontBodyAct = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
@@ -122,19 +127,25 @@ class MyFrame(wx.Frame):
         self.TCTextInputCS = wx.TextCtrl(panel,
                                          wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE)
         self.TCTextInputCS.SetFont(self.fontBodyAct)
+        # Добавление кнопки обновить, создать, очистить в сайзер:
+        self.centrSCreateActsGeneral.Add(self.BTNrefreshAll)
+        self.centrSCreateActsGeneral.Add(self.BTNCreateActCS, wx.EXPAND)
+        self.centrSCreateActsGeneral.Add(self.BTNclearAll)
 
-        #Добавление виджетов номера акта в сайзер определения акта:
+        # Добавление виджетов номера акта в сайзер определения акта:
         self.centrSActNumDef.Add(self.BTNactNum)
         self.centrSActNumDef.Add(self.TCActNumDef)
 
+        # Добавление виджетов номера АЗС, ССО, и текущей даты в сайзер:
         self.centrSAZSSSONumDef.Add(self.BTNAZSnum)
         self.centrSAZSSSONumDef.Add(self.TCAZSNumDef)
         self.centrSAZSSSONumDef.Add(self.BTNSSOnum, flag=wx.LEFT, border=5)
         self.centrSAZSSSONumDef.Add(self.TCSSONumDef)
         self.centrSAZSSSONumDef.Add(self.BTNdatenum, flag=wx.LEFT, border=5)
         self.centrSAZSSSONumDef.Add(self.TCdateNumDef)
+
         # Добавление всех элементов в центральный сайзер:
-        self.centrSCreateActs.Add(self.BTNCreateActCS, 0, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
+        self.centrSCreateActs.Add(self.centrSCreateActsGeneral, 0, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 5)
         self.centrSCreateActs.Add(self.centrSActNumDef, proportion=0, flag=wx.TOP | wx.LEFT | wx.RIGHT |
                                                                            wx.ALIGN_CENTER, border=5)
         self.centrSCreateActs.Add(self.centrSAZSSSONumDef, proportion=0, flag=wx.TOP | wx.LEFT | wx.RIGHT, border=5)
@@ -198,27 +209,43 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.azs_num_refresh, id=ID_BTN_AZSNUM)
         self.Bind(wx.EVT_BUTTON, self.sso_num_refresh, id=ID_BTN_SSONUM)
         self.Bind(wx.EVT_BUTTON, self.current_data_refresh, id=ID_BTN_DATEINP)
+        self.Bind(wx.EVT_BUTTON, self.refresh_all, id=ID_BTN_REFALL)
+        self.Bind(wx.EVT_BUTTON, self.clear_all, id=ID_BTN_CLEAR)
+
+    def clear_all(self, event):
+        if event.GetId() == ID_BTN_CLEAR:
+            self.TCActNumDef.SetLabel("")
+            self.TCAZSNumDef.SetLabel("")
+            self.TCSSONumDef.SetLabel("")
+            self.TCdateNumDef.SetLabel("")
+
+    def refresh_all(self, event):
+        if event.GetId() == ID_BTN_REFALL:
+            self.act_num_refresh(event)
+            self.azs_num_refresh(event)
+            self.sso_num_refresh(event)
+            self.current_data_refresh(event)
 
     def current_data_refresh(self, event):
-        if event.GetId() == ID_BTN_DATEINP:
+        if event.GetId() == ID_BTN_DATEINP or event.GetId() == ID_BTN_REFALL:
             self.TCdateNumDef.SetLabel(fileProcessing.get_current_date())
 
     def sso_num_refresh(self, event):
-        if event.GetId() == ID_BTN_SSONUM:
+        if event.GetId() == ID_BTN_SSONUM or event.GetId() == ID_BTN_REFALL:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
             if self.TCTextInputCS.GetValue():
                 if fileProcessing.get_from_bodylist_ssonum(txtlst):
                     self.TCSSONumDef.SetLabel(fileProcessing.get_from_bodylist_ssonum(txtlst))
 
     def azs_num_refresh(self, event):
-        if event.GetId() == ID_BTN_AZSNUM:
+        if event.GetId() == ID_BTN_AZSNUM or event.GetId() == ID_BTN_REFALL:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
             if self.TCTextInputCS.GetValue():
                 if fileProcessing.get_from_bodylist_azsnum(txtlst):
                     self.TCAZSNumDef.SetLabel(fileProcessing.get_from_bodylist_azsnum(txtlst))
 
     def act_num_refresh(self, event):
-        if event.GetId() == ID_BTN_ACTNUM:
+        if event.GetId() == ID_BTN_ACTNUM or event.GetId() == ID_BTN_REFALL:
             self.TCActNumDef.SetLabel(fileProcessing.get_number_act())
 
     def copy_pdf_in_clipboard(self, event):
