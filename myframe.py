@@ -20,7 +20,6 @@ ID_BTN_OPENDOCX = 28
 ID_BTN_RECOPYACT = 29
 ID_BTN_COPYPDFBUFF = 30
 ID_LC_ACTLIST = 35
-ID_LC_DCLICK = 36
 ID_MB_EXIT = 41
 ID_MB_OPENDOCX = 42
 ID_MB_SETTINGS = 43
@@ -213,6 +212,11 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.refresh_all, id=ID_BTN_REFALL)
         self.Bind(wx.EVT_BUTTON, self.clear_all, id=ID_BTN_CLEAR)
         self.OLVlocal_acts.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.open_docx)
+        self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.ctrl_c)
+
+    def ctrl_c(self, event):
+        if event.ControlDown() and event.GetKeyCode() == 67:
+            self.copy_pdf_in_clipboard(event)
 
     def clear_all(self, event):
         if event.GetId() == ID_BTN_CLEAR:
@@ -251,19 +255,17 @@ class MyFrame(wx.Frame):
             self.TCActNumDef.SetLabel(fileProcessing.get_number_act())
 
     def copy_pdf_in_clipboard(self, event):
-        if event.GetId() == ID_BTN_COPYPDFBUFF:
-            selection = self.OLVlocal_acts.GetSelectedObjects()
-            if selection:
-                for i in range(len(selection)):
-                    path = fileProcessing.get_path_to_file_to_string(
-                        fileProcessing.get_name_pdf_from_docx(selection[i]['title']))
-                    print(path)
-                    if i == 0:
-                        proc = subprocess.Popen(['powershell', f'Set-Clipboard -Path {path}'])
-                        proc.wait()
-                    else:
-                        proc = subprocess.Popen(['powershell', f'Set-Clipboard -Append -Path {path}'])
-                        proc.wait()
+        selection = self.OLVlocal_acts.GetSelectedObjects()
+        if selection:
+            for i in range(len(selection)):
+                path = fileProcessing.get_path_to_file_to_string(
+                    fileProcessing.get_name_pdf_from_docx(selection[i]['title']))
+                if i == 0:
+                    proc = subprocess.Popen(['powershell', f'Set-Clipboard -Path {path}'])
+                    proc.wait()
+                else:
+                    proc = subprocess.Popen(['powershell', f'Set-Clipboard -Append -Path {path}'])
+                    proc.wait()
 
     def recopy_file_in_general(self, event):
         if event.GetId() == ID_BTN_RECOPYACT:
