@@ -212,9 +212,14 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.refresh_all, id=ID_BTN_REFALL)
         self.Bind(wx.EVT_BUTTON, self.clear_all, id=ID_BTN_CLEAR)
         self.OLVlocal_acts.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.open_docx)
-        self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.ctrl_c)
+        self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.ctrl_c_in_list)
+        self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.del_action_in_list)
 
-    def ctrl_c(self, event):
+    def del_action_in_list(self, event):
+        if event.GetKeyCode() == 127:
+            self.del_acts_action(event)
+
+    def ctrl_c_in_list(self, event):
         if event.ControlDown() and event.GetKeyCode() == 67:
             self.copy_pdf_in_clipboard(event)
 
@@ -315,17 +320,16 @@ class MyFrame(wx.Frame):
             dlg.ShowModal()
 
     def del_acts_action(self, event):
-        if event.GetId() == ID_BTN_DELACT:
-            selection = self.OLVlocal_acts.GetSelectedObjects()
-            if selection:
-                dlg = wx.MessageBox('Удалить выбранные файлы?', 'Подтверждение', wx.YES_NO | wx.NO_DEFAULT, self)
-                if dlg == wx.YES:
-                    for i in range(len(selection)):
-                        os.remove(fileProcessing.get_path_to_file_to_string(selection[i]['title']))
-                        os.remove(fileProcessing.get_path_to_file_to_string(
-                            fileProcessing.get_name_pdf_from_docx(selection[i]['title'])
-                        ))
-                        self.refresh_list_acts(event)
+        selection = self.OLVlocal_acts.GetSelectedObjects()
+        if selection:
+            dlg = wx.MessageBox('Удалить выбранные файлы?', 'Подтверждение', wx.YES_NO | wx.NO_DEFAULT, self)
+            if dlg == wx.YES:
+                for i in range(len(selection)):
+                    os.remove(fileProcessing.get_path_to_file_to_string(selection[i]['title']))
+                    os.remove(fileProcessing.get_path_to_file_to_string(
+                        fileProcessing.get_name_pdf_from_docx(selection[i]['title'])
+                    ))
+                    self.refresh_list_acts(event)
 
     def refresh_list_acts(self, event):
         self.OLVlocal_acts.SetObjects(fileProcessing.get_listdir_docx_files_in_dict(settings.get_local_acts_path_folder()))
