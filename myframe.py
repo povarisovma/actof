@@ -257,15 +257,22 @@ class MyFrame(wx.Frame):
     def copy_pdf_in_clipboard(self, event):
         selection = self.OLVlocal_acts.GetSelectedObjects()
         if selection:
+            progress = wx.ProgressDialog("Копирование файлов в буфер обмена",
+                                         f"Количество файлов в очереди {len(selection)}",
+                                         maximum=len(selection),
+                                         parent=self,
+                                         style=wx.PD_AUTO_HIDE | wx.PD_APP_MODAL)
             for i in range(len(selection)):
                 path = fileProcessing.get_path_to_file_to_string(
                     fileProcessing.get_name_pdf_from_docx(selection[i]['title']))
                 if i == 0:
                     proc = subprocess.Popen(['powershell', f'Set-Clipboard -Path {path}'])
                     proc.wait()
+                    progress.Update(1, f"Количество файлов в очереди {len(selection) - (i + 1)}")
                 else:
                     proc = subprocess.Popen(['powershell', f'Set-Clipboard -Append -Path {path}'])
                     proc.wait()
+                    progress.Update(i + 1, f"Количество файлов в очереди {len(selection) - (i + 1)}")
 
     def recopy_file_in_general(self, event):
         if event.GetId() == ID_BTN_RECOPYACT:
