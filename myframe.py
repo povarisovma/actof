@@ -275,13 +275,19 @@ class MyFrame(wx.Frame):
                     progress.Update(i + 1, f"Количество файлов в очереди {len(selection) - (i + 1)}")
 
     def recopy_file_in_general(self, event):
-        if event.GetId() == ID_BTN_RECOPYACT:
-            selection = self.OLVlocal_acts.GetSelectedObjects()
-            if selection:
-                for i in range(len(selection)):
-                    fileProcessing.create_pdf_file_from_docx(fileProcessing.get_path_to_file_to_string(
-                        selection[i]['title']))
-                    fileProcessing.copy_files_to_general_folder(selection[i]['title'])
+        selection = self.OLVlocal_acts.GetSelectedObjects()
+        if selection:
+            progress = wx.ProgressDialog("Копирование...",
+                                         "Копирование файлов в общую папку",
+                                         maximum=len(selection),
+                                         parent=self,
+                                         style=wx.PD_AUTO_HIDE | wx.PD_APP_MODAL)
+            for i in range(len(selection)):
+                fileProcessing.create_pdf_file_from_docx(fileProcessing.get_path_to_file_to_string(
+                    selection[i]['title']))
+                fileProcessing.copy_files_to_general_folder(selection[i]['title'])
+                progress.Update(i + 1)
+            progress.Destroy()
 
     def open_docx(self, event):
         selection = self.OLVlocal_acts.GetSelectedObjects()
