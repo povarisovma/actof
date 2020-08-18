@@ -317,14 +317,32 @@ class MyFrame(wx.Frame):
     def createActOn(self, event):
         if event.GetId() == ID_BTN_CRARCT and self.TCTextInputCS.GetNumberOfLines() > 0:
             txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
-            fileProcessing.create_docx_and_pdf_files(
+            progress = wx.ProgressDialog("Создание Акта...", "Этап 0 из 6: Инициализация метода создания акта",
+                                         maximum=100,
+                                         parent=self,
+                                         style=wx.PD_AUTO_HIDE | wx.PD_APP_MODAL)
+            progress.Update(10, "Этап 1 из 6: Формирование имя акта")
+            filenamedocx = \
+                f"Акт{self.TCActNumDef.GetValue()}_АЗС{self.TCAZSNumDef.GetValue()}_ССО{self.TCSSONumDef.GetValue()}." \
+                f"docx"
+            progress.Update(20, "Этап 2 из 6: Формирование пути расположения акта")
+            docxpath = settings.get_local_acts_path_folder() + filenamedocx
+            progress.Update(30, "Этап 3 из 6: Создание docx документа")
+            fileProcessing.create_docx_file_from_bodylist(
                 txtlst,
                 self.TCActNumDef.GetValue(),
                 self.TCAZSNumDef.GetValue(),
                 self.TCSSONumDef.GetValue(),
-                self.TCdateNumDef.GetValue()
+                self.TCdateNumDef.GetValue(),
+                docxpath
             )
+            progress.Update(60, "Этап 4 из 6: Создание pdf документа")
+            fileProcessing.create_pdf_file_from_docx(docxpath)
+            progress.Update(80, "Этап 5 из 6: Копирование файлов в общую папку")
+            fileProcessing.copy_files_to_general_folder(filenamedocx)
             self.refresh_list_acts(event)
+            progress.Update(100, "Этап 6 из 6: Обновление списка актов")
+            progress.Destroy()
 
     def sendActOn(self, event):
         if event.GetId() == ID_BTN_SENDACT:
