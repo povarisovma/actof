@@ -20,6 +20,7 @@ ID_BTN_OPENDOCX = 28
 ID_BTN_RECOPYACT = 29
 ID_BTN_COPYPDFBUFF = 30
 ID_LC_ACTLIST = 35
+ID_LC_DCLICK = 36
 ID_MB_EXIT = 41
 ID_MB_OPENDOCX = 42
 ID_MB_SETTINGS = 43
@@ -211,6 +212,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.current_data_refresh, id=ID_BTN_DATEINP)
         self.Bind(wx.EVT_BUTTON, self.refresh_all, id=ID_BTN_REFALL)
         self.Bind(wx.EVT_BUTTON, self.clear_all, id=ID_BTN_CLEAR)
+        self.OLVlocal_acts.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.open_docx)
 
     def clear_all(self, event):
         if event.GetId() == ID_BTN_CLEAR:
@@ -273,10 +275,9 @@ class MyFrame(wx.Frame):
                     fileProcessing.copy_files_to_general_folder(selection[i]['title'])
 
     def open_docx(self, event):
-        if event.GetId() == ID_BTN_OPENDOCX:
-            selection = self.OLVlocal_acts.GetSelectedObjects()
-            if selection:
-                os.startfile(os.path.realpath(settings.get_local_acts_path_folder()) + '\\' + selection[0]['title'])
+        selection = self.OLVlocal_acts.GetSelectedObjects()
+        if selection:
+            os.startfile(os.path.realpath(settings.get_local_acts_path_folder()) + '\\' + selection[0]['title'])
 
     def onSettings(self, event):
         with mydlg.MyDlg(self, title="Настройки") as dlg:
