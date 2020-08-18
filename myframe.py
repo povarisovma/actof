@@ -350,9 +350,9 @@ class MyFrame(wx.Frame):
             progress.Update(30, "Этап 3 из 6: Создание docx документа")
             fileProcessing.create_docx_file_from_bodylist(
                 txtlst,
-                self.TCActNumDef.GetValue(),
                 self.TCAZSNumDef.GetValue(),
                 self.TCSSONumDef.GetValue(),
+                self.TCActNumDef.GetValue(),
                 self.TCdateNumDef.GetValue(),
                 docxpath
             )
