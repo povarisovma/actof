@@ -368,32 +368,19 @@ class MyFrame(wx.Frame):
         if event.GetId() == ID_BTN_SENDACT:
             selection = self.OLVlocal_acts.GetSelectedObjects()
             if selection:
-                theme = 'АЗС ' + re.sub('\\D', '', selection[0]['title'].split('_')[1]) + ' ССО '
-                themeset = set()
-                bodiez = 'Доброго времени суток.<br />'
-                if len(selection) == 1:
-                    bodiez += 'Высылаю акт '
-                if len(selection) > 1:
-                    bodiez += 'Высылаю акты '
-                for i in range(len(selection)):
-                    themeset.add(re.sub('\\D', '', selection[i]['title'].split('_')[2]))
-                    bodiez += re.sub('\\D', '', selection[i]['title'].split('_')[0]) + ', '
-                for z in themeset:
-                    theme += z + ' '
-                bodiez = bodiez.rstrip(', ') + '.'
-                print('Создание письма')
                 app = win32com.client.Dispatch("Outlook.Application")
                 mess = app.CreateItem(0)
-                mess.Subject = theme
+                mess.Subject = fileProcessing.get_theme_from_act_list(selection)
                 mess.GetInspector()
                 index = mess.HTMLbody.find('>', mess.HTMLbody.find('<body'))
-                mess.HTMLbody = mess.HTMLbody[:index + 1] + bodiez + mess.HTMLbody[index + 1:]
+                mess.HTMLbody = mess.HTMLbody[:index + 1] + fileProcessing.get_text_for_mail_from_act_list(selection) +\
+                                mess.HTMLbody[index + 1:]
                 for i in range(len(selection)):
-                    mess.Attachments.Add(
-                        fileProcessing.get_path_to_file_to_string(
-                            fileProcessing.get_name_pdf_from_docx(selection[i]['title'])
+                    if os.path.exists(fileProcessing.get_path_to_file_to_string(
+                            fileProcessing.get_name_pdf_from_docx(selection[i]['title']))):
+                        mess.Attachments.Add(
+                            fileProcessing.get_path_to_file_to_string(
+                                fileProcessing.get_name_pdf_from_docx(selection[i]['title'])
+                            )
                         )
-                    )
-                print('Отправка письма')
                 mess.Display(True)
-                print('Письмо отправлено')

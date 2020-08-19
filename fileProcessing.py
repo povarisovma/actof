@@ -194,3 +194,47 @@ def create_docx_and_pdf_files(lst, ACTnum, AZSnum, SSOnum, nowdate):
     create_docx_file_from_bodylist(lst, AZSnum, SSOnum, ACTnum, nowdate, docxpath)
     create_pdf_file_from_docx(docxpath)
     copy_files_to_general_folder(filenamedocx)
+
+
+def get_theme_from_act_list(lst):
+    if lst:
+        theme = ''
+        azsset = set()
+        ssoset = set()
+        for i in range(len(lst)):
+            azsset.add(re.sub('\\D', '', lst[i]['title'].split('_')[1]))
+        for azs in azsset:
+            theme += 'АЗС ' + azs + ' ССО '
+            for j in range(len(lst)):
+                if (re.sub('\\D', '', lst[j]['title'].split('_')[1])) == azs:
+                    ssoset.add(re.sub('\\D', '', lst[j]['title'].split('_')[2]))
+            theme += ' '.join(ssoset)
+            theme += ' '
+            ssoset.clear()
+        return theme
+
+
+def get_text_for_mail_from_act_list(lst):
+    if lst:
+        azsset = set()
+        actset = set()
+        bodytext = 'Доброго времени суток.<br />'
+        for i in range(len(lst)):
+            azsset.add(re.sub('\\D', '', lst[i]['title'].split('_')[1]))
+        for azs in azsset:
+            bodytext += 'По АЗС ' + azs + ' высылаю '
+            for j in range(len(lst)):
+                if (re.sub('\\D', '', lst[j]['title'].split('_')[1])) == azs:
+                    actset.add(re.sub('\\D', '', lst[j]['title'].split('_')[0]))
+            if len(actset) > 1:
+                bodytext += 'акты '
+            else:
+                bodytext += 'акт '
+            bodytext += ' '.join(actset)
+            bodytext += '<br />'
+            actset.clear()
+        bodytext += 'Также обращаю ваше внимание, что для произведения корректировок на основании актов необходимо ' \
+                    'подать новую заявку, отдельную для каждого акта. Если по акту требуется произвести выплату ' \
+                    'денежных средств, то перед подачей заявки необходимо согласовать выполнение акта с отделом ' \
+                    'коммерческого учета<br />'
+        return bodytext
