@@ -9,3 +9,4 @@ test.py
 /__pycache__
 /settings.ini
 /oldcodefile/
+test.db
