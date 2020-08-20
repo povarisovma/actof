@@ -34,6 +34,10 @@ ID_BTN_SSONUM = 75
 ID_TC_SSONUM = 76
 ID_BTN_DATEINP = 77
 ID_TC_DATEINP = 78
+ID_BTN_SAVETEMPLACT = 81
+ID_BTN_CHANGETEMPLACT = 82
+ID_BTN_DELTEMPLACT = 83
+ID_BTN_ADDTEMPLACT = 84
 
 
 class MyFrame(wx.Frame):
@@ -69,15 +73,22 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.openDocxTemplate, id=ID_MB_OPENDOCX)
         self.Bind(wx.EVT_MENU, self.about, id=ID_MB_ABOUT)
 
+        #Определение шрифтов:
+        self.fontSTactNum = wx.Font(15, wx.MODERN, wx.NORMAL, wx.BOLD, False, u'Times New Roman')
+        self.fontBodyAct = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
+        self.fontOLV = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Roboto')
+        self.font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Montserrat')
+
 
         #Создание панели:
         panel = wx.Panel(self)
-        self.font = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Montserrat')
         panel.SetFont(self.font)
 
         #Объявление сайзеров------------------------------------------------------------------------
         #Главный сайзер программы:
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
+        #Левая часть для шаблонов актов:
+        self.leftSTemplActs = wx.BoxSizer(wx.VERTICAL)
         #Центральная часть сайзеры для создания актов:
         self.centrSCreateActs = wx.BoxSizer(wx.VERTICAL)
         self.centrSCreateActsGeneral = wx.BoxSizer(wx.HORIZONTAL)
@@ -89,14 +100,40 @@ class MyFrame(wx.Frame):
         self.rSizerfileworkBTN = wx.BoxSizer(wx.HORIZONTAL)
 
 
+        #Левая часть программы, список шаблонов и кнопки управления ими:
+        #Создание кнопки Сохранить шаблон акта
+        self.BTNSaveTemplateAct = wx.Button(panel, id=ID_BTN_SAVETEMPLACT, label="Сохранить <-")
+        self.BTNChangeTemplAct = wx.Button(panel, id=ID_BTN_CHANGETEMPLACT, label="Изменить")
+        self.BTNDeleteTemplAct = wx.Button(panel, id=ID_BTN_DELTEMPLACT, label="Удалить")
+        self.BTNAddTemplAct = wx.Button(panel, id=ID_BTN_ADDTEMPLACT, label="Добавить ->")
+
+        #Добавление виджетов управления шаблонами актов в левый сайзер:
+        self.leftSTemplActs.Add(self.BTNSaveTemplateAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
+        self.leftSTemplActs.Add(self.BTNChangeTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
+        self.leftSTemplActs.Add(self.BTNDeleteTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
+        self.leftSTemplActs.Add(self.BTNAddTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
+
+        #Создание списка шаблонов:
+        self.OLVtempl_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+        templnum = ColumnDefn("№", "left", 50, "templnum", isSpaceFilling=False)
+        desctempl = ColumnDefn("Описание шаблона", "left", 250, "desctempl", isSpaceFilling=False)
+        self.OLVtempl_acts.oddRowsBackColor = wx.WHITE
+        self.OLVtempl_acts.SetFont(self.fontOLV)
+        self.OLVtempl_acts.SetColumns([templnum, desctempl])
+
+        # Добавление списка актов в сайзер
+        self.leftSTemplActs.Add(self.OLVtempl_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.LEFT, border=5)
+
+        #Добавление левого сайзера в главный сайзер:
+        self.mainSizer.Add(self.leftSTemplActs, flag=wx.EXPAND | wx.BOTTOM, border=5)
+
+
         #Центральная часть программы, поле для ввода текста и кнопка создать акт:
         #Создание кнопок "Обновить всё", "Создать Акт", "Очистить":
         self.BTNrefreshAll = wx.Button(panel, id=ID_BTN_REFALL, label="Обновить всё")
         self.BTNCreateActCS = wx.Button(panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
         self.BTNclearAll = wx.Button(panel, id=ID_BTN_CLEAR, label="Очистить")
-        #Определение шрифтов:
-        self.fontSTactNum = wx.Font(15, wx.MODERN, wx.NORMAL, wx.BOLD, False, u'Times New Roman')
-        self.fontBodyAct = wx.Font(12, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Times New Roman')
+
         #Создание заголовка "Акт №" + поле ввода акта + кнопка обновить:
         self.BTNactNum = wx.Button(panel, ID_BTN_ACTNUM, label="Акт №")
         self.BTNactNum.SetFont(self.fontSTactNum)
@@ -189,7 +226,8 @@ class MyFrame(wx.Frame):
         self.OLVlocal_acts.SetObjects(
             fileProcessing.get_listdir_docx_files_in_dict(settings.get_local_acts_path_folder()))
         #Добавление списка актов в сайзер
-        self.rightSSendActs.Add(self.OLVlocal_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
+        self.rightSSendActs.Add(self.OLVlocal_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.RIGHT | wx.BOTTOM,
+                                border=5)
 
         #Добавление правого сайзера в главный сайзер.
         self.mainSizer.Add(self.rightSSendActs, proportion=0, flag=wx.EXPAND)
