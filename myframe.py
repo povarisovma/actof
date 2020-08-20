@@ -38,6 +38,7 @@ ID_BTN_SAVETEMPLACT = 81
 ID_BTN_CHANGETEMPLACT = 82
 ID_BTN_DELTEMPLACT = 83
 ID_BTN_ADDTEMPLACT = 84
+ID_BTN_REFTEMPLACT = 85
 
 
 class MyFrame(wx.Frame):
@@ -104,24 +105,30 @@ class MyFrame(wx.Frame):
         #Создание кнопки Сохранить шаблон акта
         self.BTNSaveTemplateAct = wx.Button(panel, id=ID_BTN_SAVETEMPLACT, label="Сохранить <-")
         self.BTNChangeTemplAct = wx.Button(panel, id=ID_BTN_CHANGETEMPLACT, label="Изменить")
+        self.BTNRefreshTemplAct = wx.Button(panel, id=ID_BTN_REFTEMPLACT, label="Обновить список")
         self.BTNDeleteTemplAct = wx.Button(panel, id=ID_BTN_DELTEMPLACT, label="Удалить")
         self.BTNAddTemplAct = wx.Button(panel, id=ID_BTN_ADDTEMPLACT, label="Добавить ->")
 
         #Добавление виджетов управления шаблонами актов в левый сайзер:
         self.leftSTemplActs.Add(self.BTNSaveTemplateAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
         self.leftSTemplActs.Add(self.BTNChangeTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
+        self.leftSTemplActs.Add(self.BTNRefreshTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
         self.leftSTemplActs.Add(self.BTNDeleteTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
         self.leftSTemplActs.Add(self.BTNAddTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
 
         #Создание списка шаблонов:
         self.OLVtempl_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         templnum = ColumnDefn("№", "left", 50, "templnum", isSpaceFilling=False)
-        desctempl = ColumnDefn("Описание шаблона", "left", 250, "desctempl", isSpaceFilling=False)
+        desctempl = ColumnDefn("Описание шаблона", "left", 300, "desctempl", isSpaceFilling=False)
         self.OLVtempl_acts.oddRowsBackColor = wx.WHITE
         self.OLVtempl_acts.SetFont(self.fontOLV)
         self.OLVtempl_acts.SetColumns([templnum, desctempl])
+        self.OLVtempl_acts.SetObjects([{"templnum": 1, "desctempl": "Выплата по АСУ"},
+                                       {"templnum": 2, "desctempl": "Выплата по ККМ"},
+                                       {"templnum": 3, "desctempl": "Выплата по АСУ + ККМ"},
+                                       {"templnum": 4, "desctempl": "Темпокасса"}])
 
-        # Добавление списка актов в сайзер
+        # Добавление списка актов в левый сайзер
         self.leftSTemplActs.Add(self.OLVtempl_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.LEFT, border=5)
 
         #Добавление левого сайзера в главный сайзер:
@@ -213,13 +220,12 @@ class MyFrame(wx.Frame):
         #Создание списка актов
         self.OLVlocal_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
-        title = ColumnDefn("Имя", "left", 240, "title", isSpaceFilling=False)
+        title = ColumnDefn("Имя", "left", 280, "title", isSpaceFilling=False)
         creating = ColumnDefn("Дата создания", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S",
                               isSpaceFilling=False)
         modifine = ColumnDefn("Дата изменения", "left", 130, "modifine",  stringConverter="%d-%m-%Y %H:%M:%S",
                               isSpaceFilling=False)
         self.OLVlocal_acts.oddRowsBackColor = wx.WHITE
-        self.fontOLV = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, False, u'Roboto')
         self.OLVlocal_acts.SetFont(self.fontOLV)
         self.OLVlocal_acts.SetColumns([title, creating, modifine])
         #Добавление в список актов из папки locals_act
