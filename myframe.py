@@ -258,6 +258,26 @@ class MyFrame(wx.Frame):
         self.OLVlocal_acts.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.open_docx)
         self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.ctrl_c_in_list)
         self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.del_action_in_list)
+        self.Bind(wx.EVT_BUTTON, self.btn_save_templ_act, id=ID_BTN_SAVETEMPLACT)
+        self.Bind(wx.EVT_BUTTON, self.btn_change_templ_act, id=ID_BTN_CHANGETEMPLACT)
+        self.Bind(wx.EVT_BUTTON, self.btn_refresh_templ_act, id=ID_BTN_REFTEMPLACT)
+        self.Bind(wx.EVT_BUTTON, self.btn_delete_templ_act, id=ID_BTN_DELTEMPLACT)
+        self.Bind(wx.EVT_BUTTON, self.btn_add_templ_act, id=ID_BTN_ADDTEMPLACT)
+
+    def btn_add_templ_act(self, event):
+        print("add templ act")
+
+    def btn_delete_templ_act(self, event):
+        print("delete temlp act")
+
+    def btn_refresh_templ_act(self, event):
+        print("refresh templ activate")
+
+    def btn_change_templ_act(self, event):
+        print("change act activate")
+
+    def btn_save_templ_act(self, event):
+        print("save act activate")
 
     def del_action_in_list(self, event):
         if event.GetKeyCode() == 127:
