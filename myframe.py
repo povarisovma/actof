@@ -9,6 +9,7 @@ import settings
 import mydlg
 import aboutdlg
 from ObjectListView import ObjectListView, ColumnDefn
+import templatesdb as db
 
 ID_BTN_REFALL = 16
 ID_BTN_CRARCT = 15
@@ -103,11 +104,11 @@ class MyFrame(wx.Frame):
 
         #Левая часть программы, список шаблонов и кнопки управления ими:
         #Создание кнопки Сохранить шаблон акта
-        self.BTNSaveTemplateAct = wx.Button(panel, id=ID_BTN_SAVETEMPLACT, label="Сохранить <-")
-        self.BTNChangeTemplAct = wx.Button(panel, id=ID_BTN_CHANGETEMPLACT, label="Изменить")
-        self.BTNRefreshTemplAct = wx.Button(panel, id=ID_BTN_REFTEMPLACT, label="Обновить список")
-        self.BTNDeleteTemplAct = wx.Button(panel, id=ID_BTN_DELTEMPLACT, label="Удалить")
-        self.BTNAddTemplAct = wx.Button(panel, id=ID_BTN_ADDTEMPLACT, label="Добавить ->")
+        self.BTNSaveTemplateAct = wx.Button(panel, id=ID_BTN_SAVETEMPLACT, label="Сохранить шаблон <-")
+        self.BTNChangeTemplAct = wx.Button(panel, id=ID_BTN_CHANGETEMPLACT, label="Изменить шаблон")
+        self.BTNRefreshTemplAct = wx.Button(panel, id=ID_BTN_REFTEMPLACT, label="Обновить список шаблонов")
+        self.BTNDeleteTemplAct = wx.Button(panel, id=ID_BTN_DELTEMPLACT, label="Удалить шаблон")
+        self.BTNAddTemplAct = wx.Button(panel, id=ID_BTN_ADDTEMPLACT, label="Применить шаблон ->")
 
         #Добавление виджетов управления шаблонами актов в левый сайзер:
         self.leftSTemplActs.Add(self.BTNSaveTemplateAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
@@ -123,11 +124,7 @@ class MyFrame(wx.Frame):
         self.OLVtempl_acts.oddRowsBackColor = wx.WHITE
         self.OLVtempl_acts.SetFont(self.fontOLV)
         self.OLVtempl_acts.SetColumns([templnum, desctempl])
-        self.OLVtempl_acts.SetObjects([{"templnum": 1, "desctempl": "Выплата по АСУ"},
-                                       {"templnum": 2, "desctempl": "Выплата по ККМ"},
-                                       {"templnum": 3, "desctempl": "Выплата по АСУ + ККМ"},
-                                       {"templnum": 4, "desctempl": "Темпокасса"}])
-
+        self.OLVtempl_acts.SetObjects(db.gettemplateslistfromdb())
         # Добавление списка актов в левый сайзер
         self.leftSTemplActs.Add(self.OLVtempl_acts, proportion=1, flag=wx.EXPAND | wx.TOP | wx.LEFT, border=5)
 
@@ -139,7 +136,7 @@ class MyFrame(wx.Frame):
         #Создание кнопок "Обновить всё", "Создать Акт", "Очистить":
         self.BTNrefreshAll = wx.Button(panel, id=ID_BTN_REFALL, label="Обновить всё")
         self.BTNCreateActCS = wx.Button(panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
-        self.BTNclearAll = wx.Button(panel, id=ID_BTN_CLEAR, label="Очистить")
+        self.BTNclearAll = wx.Button(panel, id=ID_BTN_CLEAR, label="Очистить всё")
 
         #Создание заголовка "Акт №" + поле ввода акта + кнопка обновить:
         self.BTNactNum = wx.Button(panel, ID_BTN_ACTNUM, label="Акт №")
@@ -265,19 +262,40 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.btn_add_templ_act, id=ID_BTN_ADDTEMPLACT)
 
     def btn_add_templ_act(self, event):
-        print("add templ act")
+        selection = self.OLVtempl_acts.GetSelectedObjects()
+        if selection:
+            complitetextlist = fileProcessing.settextactfromtemplate(
+                fileProcessing.splittextonlist(db.gettemplatetextfromdb(selection[0]['templnum'])),
+                fileProcessing.splittextonlist(self.TCTextInputCS.GetValue())
+            )
+            self.TCTextInputCS.SetLabel('')
+            for i in range(len(complitetextlist)):
+                if len(complitetextlist) - 1 == i:
+                    self.TCTextInputCS.AppendText(complitetextlist[i])
+                else:
+                    self.TCTextInputCS.AppendText(complitetextlist[i] + '\n')
 
     def btn_delete_templ_act(self, event):
-        print("delete temlp act")
+        selection = self.OLVtempl_acts.GetSelectedObjects()
+        if selection:
+            db.deletetemplatefromdb(selection[0]['templnum'])
+            self.btn_refresh_templ_act(event)
 
     def btn_refresh_templ_act(self, event):
-        print("refresh templ activate")
+        self.OLVtempl_acts.SetObjects(db.gettemplateslistfromdb())
 
     def btn_change_templ_act(self, event):
         print("change act activate")
 
     def btn_save_templ_act(self, event):
-        print("save act activate")
+        dlg = wx.TextEntryDialog(self, message="Укажите краткое описание:",
+                                 caption="Добавление шаблона",
+                                 style=wx.TextEntryDialogStyle)
+        res = dlg.ShowModal()
+        if res == wx.ID_OK:
+            print(dlg.GetValue())
+            db.inserttemplateindb((dlg.GetValue(), self.TCTextInputCS.GetValue()))
+            self.btn_refresh_templ_act(event)
 
     def del_action_in_list(self, event):
         if event.GetKeyCode() == 127:
@@ -293,6 +311,7 @@ class MyFrame(wx.Frame):
             self.TCAZSNumDef.SetLabel("")
             self.TCSSONumDef.SetLabel("")
             self.TCdateNumDef.SetLabel("")
+            self.TCTextInputCS.SetLabel("")
 
     def refresh_all(self, event):
         if event.GetId() == ID_BTN_REFALL:
@@ -314,7 +333,7 @@ class MyFrame(wx.Frame):
 
     def azs_num_refresh(self, event):
         if event.GetId() == ID_BTN_AZSNUM or event.GetId() == ID_BTN_REFALL:
-            txtlst = list(map(lambda x: x.strip(), self.TCTextInputCS.GetValue().split('\n')))
+            txtlst = fileProcessing.splittextonlist(self.TCTextInputCS.GetValue())
             if self.TCTextInputCS.GetValue():
                 if fileProcessing.get_from_bodylist_azsnum(txtlst):
                     self.TCAZSNumDef.SetLabel(fileProcessing.get_from_bodylist_azsnum(txtlst))

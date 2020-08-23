@@ -1,9 +1,11 @@
 import wx
 import settings
 import myframe
+import templatesdb
 
 
 def main():
+    templatesdb.createdb()
     settings.create_settings_file()
     app = wx.App()
     frame = myframe.MyFrame(None).Show()

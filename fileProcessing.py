@@ -7,6 +7,7 @@ import shutil
 import re
 import settings
 import datetime
+import copy
 
 
 def textforlist(textinput):
@@ -238,3 +239,119 @@ def get_text_for_mail_from_act_list(lst):
                     'денежных средств, то перед подачей заявки необходимо согласовать выполнение акта с отделом ' \
                     'коммерческого учета<br />'
         return bodytext
+
+
+def splittextonlist(txt):
+    return list(map(lambda x: x.strip(), txt.split('\n')))
+
+
+def settextactfromtemplate(template=None, userinput=None):
+    userinputtext = copy.deepcopy(userinput)
+    templatetext = copy.deepcopy(template)
+    exitlist = []
+    firstline = 0
+    middleline = 0
+    #Проставление первого абзаца из введенного текста:
+    for i in range(len(userinputtext)):
+        if 'Настоящим подтверждаю' in userinputtext[i] and firstline == 0:
+            exitlist.append(userinputtext[i])
+            firstline = 1
+            userinputtext.pop(i)
+            break
+    if firstline == 0:
+        for i in range(len(userinputtext)):
+            if 'Также подтверждаю' in userinputtext[i] and firstline == 0:
+                userinputtext[i] = userinputtext[i].replace('Также подтверждаю', 'Настоящим подтверждаю')
+                exitlist.append(userinputtext[i])
+                firstline = 1
+                userinputtext.pop(i)
+                break
+            elif 'Так же подтверждаю' in userinputtext[i] and firstline == 0:
+                userinputtext[i] = userinputtext[i].replace('Так же подтверждаю', 'Настоящим подтверждаю')
+                exitlist.append(userinputtext[i])
+                firstline = 1
+                userinputtext.pop(i)
+                break
+    #Добавление всех оставшихся абзацев из введеного текста начинающихся с "Также подтверждаю"
+    if firstline == 1:
+        for i in range(len(userinputtext)):
+            if 'Также подтверждаю' in userinputtext[i]:
+                exitlist.append(userinputtext[i])
+                continue
+            if 'Так же подтверждаю' in userinputtext[i]:
+                exitlist.append(userinputtext[i])
+                continue
+            if 'Настоящим подтверждаю' in userinputtext[i]:
+                userinputtext[i].replace('Настоящим подтверждаю', 'Также подтверждаю')
+                exitlist.append(userinputtext[i])
+                continue
+    #Проставление первого абзаца из добавленого шаблона в случае отсутсвия первого абзаца в веденном тексте:
+    if firstline == 0:
+        for i in range(len(templatetext)):
+            if 'Настоящим подтверждаю' in templatetext[i] and firstline == 0:
+                exitlist.append(templatetext[i])
+                firstline = 1
+                templatetext.pop(i)
+                break
+            elif 'Настоящим подтверждаю' in templatetext[i] and firstline == 1:
+                templatetext[i] = templatetext[i].replace('Настоящим подтверждаю', 'Также подтверждаю')
+    if firstline == 0:
+        for i in range(len(templatetext)):
+            if 'Также подтверждаю' in templatetext[i] and firstline == 0:
+                templatetext[i] = templatetext[i].replace('Также подтверждаю', 'Настоящим подтверждаю')
+                exitlist.append(templatetext[i])
+                firstline = 1
+                templatetext.pop(i)
+                break
+            if 'Так же подтверждаю' in templatetext[i] and firstline == 0:
+                templatetext[i] = templatetext[i].replace('Так же подтверждаю', 'Настоящим подтверждаю')
+                exitlist.append(templatetext[i])
+                firstline = 1
+                templatetext.pop(i)
+                break
+    # Добавление всех абзацев из шаблона начинающихся с "Также подтверждаю"
+    if firstline == 1:
+        for i in range(len(templatetext)):
+            if 'Также подтверждаю' in templatetext[i]:
+                exitlist.append(templatetext[i])
+                continue
+            if 'Так же подтверждаю' in templatetext[i]:
+                exitlist.append(templatetext[i])
+                continue
+            if 'Настоящим подтверждаю' in templatetext[i]:
+                templatetext[i] = templatetext[i].replace('Настоящим подтверждаю', 'Также подтверждаю')
+                exitlist.append(templatetext[i])
+                continue
+    #Добавление абзаца "В связи с чем, прошу:" если он есть либо в шаблоне либо в введеном тексте:
+    for i in range(len(userinputtext)):
+        if 'В связи с чем, прошу:' in userinputtext[i]:
+            exitlist.append(userinputtext[i])
+            middleline = 1
+            break
+    if middleline == 0:
+        for i in range(len(templatetext)):
+            if 'В связи с чем, прошу:' in templatetext[i]:
+                exitlist.append(templatetext[i])
+                middleline = 1
+                break
+    #Добавление остальных абзацей из введеного текста:
+    for i in range(len(userinputtext)):
+        if 'В связи с чем, прошу:' not in userinputtext[i] and \
+                'Также подтверждаю' not in userinputtext[i] and \
+                'Так же подтверждаю' not in userinputtext[i] and \
+                'Настоящим подтверждаю' not in userinputtext[i] and \
+                userinputtext[i] != '':
+            if 'В связи с чем, прошу:' not in exitlist:
+                exitlist.append('В связи с чем, прошу:')
+            exitlist.append(userinputtext[i])
+    #Добавление остальных абзацей из шаблона:
+    for i in range(len(templatetext)):
+        if 'В связи с чем, прошу:' not in templatetext[i] and \
+                'Также подтверждаю' not in templatetext[i] and \
+                'Так же подтверждаю' not in templatetext[i] and \
+                'Настоящим подтверждаю' not in templatetext[i] and \
+                templatetext[i] != '':
+            if 'В связи с чем, прошу:' not in exitlist:
+                exitlist.append('В связи с чем, прошу:')
+            exitlist.append(templatetext[i])
+    return exitlist
