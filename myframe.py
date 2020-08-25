@@ -254,7 +254,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.clear_all, id=ID_BTN_CLEAR)
         self.OLVlocal_acts.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.open_docx)
         self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.ctrl_c_in_list)
-        self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.del_action_in_list)
+        self.OLVlocal_acts.Bind(wx.EVT_KEY_DOWN, self.enter_and_del_action_in_list)
         self.Bind(wx.EVT_BUTTON, self.btn_save_templ_act, id=ID_BTN_SAVETEMPLACT)
         self.Bind(wx.EVT_BUTTON, self.btn_change_templ_act, id=ID_BTN_CHANGETEMPLACT)
         self.Bind(wx.EVT_BUTTON, self.btn_refresh_templ_act, id=ID_BTN_REFTEMPLACT)
@@ -297,9 +297,13 @@ class MyFrame(wx.Frame):
             db.inserttemplateindb((dlg.GetValue(), self.TCTextInputCS.GetValue()))
             self.btn_refresh_templ_act(event)
 
-    def del_action_in_list(self, event):
+    def enter_and_del_action_in_list(self, event):
         if event.GetKeyCode() == 127:
             self.del_acts_action(event)
+        elif event.GetKeyCode() == 370:
+            selection = self.OLVlocal_acts.GetSelectedObjects()
+            if selection:
+                os.startfile(os.path.realpath(fileProcessing.get_path_to_file_to_string(selection[0]['title'])))
 
     def ctrl_c_in_list(self, event):
         if event.ControlDown() and event.GetKeyCode() == 67:
@@ -380,7 +384,7 @@ class MyFrame(wx.Frame):
     def open_docx(self, event):
         selection = self.OLVlocal_acts.GetSelectedObjects()
         if selection:
-            os.startfile(os.path.realpath(settings.get_local_acts_path_folder()) + '\\' + selection[0]['title'])
+            os.startfile(os.path.realpath(fileProcessing.get_path_to_file_to_string(selection[0]['title'])))
 
     def onSettings(self, event):
         with mydlg.MyDlg(self, title="Настройки") as dlg:
