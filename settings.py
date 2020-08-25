@@ -31,7 +31,9 @@ def get_local_acts_path_folder(path=path_to_settings_file()):
     """
     config = configparser.ConfigParser()
     config.read(path)
-    return config.get("Settings", "local_acts_path")
+    if os.path.exists(config.get("Settings", "local_acts_path")):
+        return config.get("Settings", "local_acts_path")
+    return "C:\\"
 
 
 def get_general_acts_path_folder(path=path_to_settings_file()):
