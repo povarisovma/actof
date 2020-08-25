@@ -260,6 +260,14 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.btn_refresh_templ_act, id=ID_BTN_REFTEMPLACT)
         self.Bind(wx.EVT_BUTTON, self.btn_delete_templ_act, id=ID_BTN_DELTEMPLACT)
         self.Bind(wx.EVT_BUTTON, self.btn_add_templ_act, id=ID_BTN_ADDTEMPLACT)
+        self.OLVtempl_acts.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.btn_add_templ_act)
+        self.OLVtempl_acts.Bind(wx.EVT_KEY_DOWN, self.enter_del_btn_action_in_templ_ovl)
+
+    def enter_del_btn_action_in_templ_ovl(self, event):
+        if event.GetKeyCode() == 127:
+            self.btn_delete_templ_act(event)
+        elif event.GetKeyCode() == 370 or event.GetKeyCode() == 13:
+            self.btn_add_templ_act(event)
 
     def btn_add_templ_act(self, event):
         selection = self.OLVtempl_acts.GetSelectedObjects()
@@ -278,8 +286,10 @@ class MyFrame(wx.Frame):
     def btn_delete_templ_act(self, event):
         selection = self.OLVtempl_acts.GetSelectedObjects()
         if selection:
-            db.deletetemplatefromdb(selection[0]['templnum'])
-            self.btn_refresh_templ_act(event)
+            dlg = wx.MessageBox('Удалить выбранный шаблон?', 'Подтверждение', wx.YES_NO | wx.NO_DEFAULT, self)
+            if dlg == wx.YES:
+                db.deletetemplatefromdb(selection[0]['templnum'])
+                self.btn_refresh_templ_act(event)
 
     def btn_refresh_templ_act(self, event):
         self.OLVtempl_acts.SetObjects(db.gettemplateslistfromdb())
@@ -293,14 +303,13 @@ class MyFrame(wx.Frame):
                                  style=wx.TextEntryDialogStyle)
         res = dlg.ShowModal()
         if res == wx.ID_OK:
-            print(dlg.GetValue())
             db.inserttemplateindb((dlg.GetValue(), self.TCTextInputCS.GetValue()))
             self.btn_refresh_templ_act(event)
 
     def enter_and_del_action_in_list(self, event):
         if event.GetKeyCode() == 127:
             self.del_acts_action(event)
-        elif event.GetKeyCode() == 370:
+        elif event.GetKeyCode() == 370 or event.GetKeyCode() == 13:
             selection = self.OLVlocal_acts.GetSelectedObjects()
             if selection:
                 os.startfile(os.path.realpath(fileProcessing.get_path_to_file_to_string(selection[0]['title'])))
