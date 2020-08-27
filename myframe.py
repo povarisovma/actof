@@ -10,6 +10,7 @@ import mydlg
 import aboutdlg
 from ObjectListView import ObjectListView, ColumnDefn
 import templatesdb as db
+import changetemplatedlg
 
 ID_BTN_REFALL = 16
 ID_BTN_CRARCT = 15
@@ -296,6 +297,8 @@ class MyFrame(wx.Frame):
 
     def btn_change_templ_act(self, event):
         print("change act activate")
+        with changetemplatedlg.ChangeTemplDlg(self, title="Изменение шаблона", size=wx.Size(1037, 605)) as dlg:
+            dlg.ShowModal()
 
     def btn_save_templ_act(self, event):
         dlg = wx.TextEntryDialog(self, message="Укажите краткое описание:",
