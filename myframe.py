@@ -84,8 +84,8 @@ class MyFrame(wx.Frame):
 
 
         #Создание панели:
-        panel = wx.Panel(self)
-        panel.SetFont(self.font)
+        self.panel = wx.Panel(self)
+        self.panel.SetFont(self.font)
 
         #Объявление сайзеров------------------------------------------------------------------------
         #Главный сайзер программы:
@@ -105,11 +105,11 @@ class MyFrame(wx.Frame):
 
         #Левая часть программы, список шаблонов и кнопки управления ими:
         #Создание кнопки Сохранить шаблон акта
-        self.BTNSaveTemplateAct = wx.Button(panel, id=ID_BTN_SAVETEMPLACT, label="Сохранить шаблон <-")
-        self.BTNChangeTemplAct = wx.Button(panel, id=ID_BTN_CHANGETEMPLACT, label="Изменить шаблон")
-        self.BTNRefreshTemplAct = wx.Button(panel, id=ID_BTN_REFTEMPLACT, label="Обновить список шаблонов")
-        self.BTNDeleteTemplAct = wx.Button(panel, id=ID_BTN_DELTEMPLACT, label="Удалить шаблон")
-        self.BTNAddTemplAct = wx.Button(panel, id=ID_BTN_ADDTEMPLACT, label="Применить шаблон ->")
+        self.BTNSaveTemplateAct = wx.Button(self.panel, id=ID_BTN_SAVETEMPLACT, label="Сохранить шаблон <-")
+        self.BTNChangeTemplAct = wx.Button(self.panel, id=ID_BTN_CHANGETEMPLACT, label="Изменить шаблон")
+        self.BTNRefreshTemplAct = wx.Button(self.panel, id=ID_BTN_REFTEMPLACT, label="Обновить список шаблонов")
+        self.BTNDeleteTemplAct = wx.Button(self.panel, id=ID_BTN_DELTEMPLACT, label="Удалить шаблон")
+        self.BTNAddTemplAct = wx.Button(self.panel, id=ID_BTN_ADDTEMPLACT, label="Применить шаблон ->")
 
         #Добавление виджетов управления шаблонами актов в левый сайзер:
         self.leftSTemplActs.Add(self.BTNSaveTemplateAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
@@ -119,7 +119,7 @@ class MyFrame(wx.Frame):
         self.leftSTemplActs.Add(self.BTNAddTemplAct, flag=wx.LEFT | wx.TOP | wx.EXPAND, border=5)
 
         #Создание списка шаблонов:
-        self.OLVtempl_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+        self.OLVtempl_acts = ObjectListView(self.panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         templnum = ColumnDefn("№", "left", 50, "templnum", isSpaceFilling=False)
         desctempl = ColumnDefn("Описание шаблона", "left", 300, "desctempl", isSpaceFilling=False)
         self.OLVtempl_acts.oddRowsBackColor = wx.WHITE
@@ -135,38 +135,38 @@ class MyFrame(wx.Frame):
 
         #Центральная часть программы, поле для ввода текста и кнопка создать акт:
         #Создание кнопок "Обновить всё", "Создать Акт", "Очистить":
-        self.BTNrefreshAll = wx.Button(panel, id=ID_BTN_REFALL, label="Обновить всё")
-        self.BTNCreateActCS = wx.Button(panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
-        self.BTNclearAll = wx.Button(panel, id=ID_BTN_CLEAR, label="Очистить всё")
+        self.BTNrefreshAll = wx.Button(self.panel, id=ID_BTN_REFALL, label="Обновить всё")
+        self.BTNCreateActCS = wx.Button(self.panel, id=ID_BTN_CRARCT, label=u"Создать Акт")
+        self.BTNclearAll = wx.Button(self.panel, id=ID_BTN_CLEAR, label="Очистить всё")
 
         #Создание заголовка "Акт №" + поле ввода акта + кнопка обновить:
-        self.BTNactNum = wx.Button(panel, ID_BTN_ACTNUM, label="Акт №")
+        self.BTNactNum = wx.Button(self.panel, ID_BTN_ACTNUM, label="Акт №")
         self.BTNactNum.SetFont(self.fontSTactNum)
 
-        self.TCActNumDef = wx.TextCtrl(panel, ID_TC_ACTNUM, wx.EmptyString, wx.DefaultPosition, size=(85, -1))
+        self.TCActNumDef = wx.TextCtrl(self.panel, ID_TC_ACTNUM, wx.EmptyString, wx.DefaultPosition, size=(85, -1))
         self.TCActNumDef.SetFont(self.fontSTactNum)
 
         #Создание шапки документа номер АЗС номер ССО по аналогии с номером акта, текущая дата:
-        self.BTNAZSnum = wx.Button(panel, ID_BTN_AZSNUM, label="АЗС №")
+        self.BTNAZSnum = wx.Button(self.panel, ID_BTN_AZSNUM, label="АЗС №")
         self.BTNAZSnum.SetFont(self.fontBodyAct)
 
-        self.TCAZSNumDef = wx.TextCtrl(panel, ID_TC_AZSNUM, wx.EmptyString, wx.DefaultPosition, size=(65, -1))
+        self.TCAZSNumDef = wx.TextCtrl(self.panel, ID_TC_AZSNUM, wx.EmptyString, wx.DefaultPosition, size=(65, -1))
         self.TCAZSNumDef.SetFont(self.fontBodyAct)
 
-        self.BTNSSOnum = wx.Button(panel, ID_BTN_SSONUM, label="ССО №")
+        self.BTNSSOnum = wx.Button(self.panel, ID_BTN_SSONUM, label="ССО №")
         self.BTNSSOnum.SetFont(self.fontBodyAct)
 
-        self.TCSSONumDef = wx.TextCtrl(panel, ID_TC_SSONUM, wx.EmptyString, wx.DefaultPosition, size=(65, -1))
+        self.TCSSONumDef = wx.TextCtrl(self.panel, ID_TC_SSONUM, wx.EmptyString, wx.DefaultPosition, size=(65, -1))
         self.TCSSONumDef.SetFont(self.fontBodyAct)
 
-        self.BTNdatenum = wx.Button(panel, ID_BTN_DATEINP, label="Дата")
+        self.BTNdatenum = wx.Button(self.panel, ID_BTN_DATEINP, label="Дата")
         self.BTNdatenum.SetFont(self.fontBodyAct)
 
-        self.TCdateNumDef = wx.TextCtrl(panel, ID_TC_DATEINP, wx.EmptyString, wx.DefaultPosition, size=(150, -1))
+        self.TCdateNumDef = wx.TextCtrl(self.panel, ID_TC_DATEINP, wx.EmptyString, wx.DefaultPosition, size=(150, -1))
         self.TCdateNumDef.SetFont(self.fontBodyAct)
 
         #Создание текстового поля ввода текста акта:
-        self.TCTextInputCS = wx.TextCtrl(panel,
+        self.TCTextInputCS = wx.TextCtrl(self.panel,
                                          wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE)
         self.TCTextInputCS.SetFont(self.fontBodyAct)
         # Добавление кнопки обновить, создать, очистить в сайзер:
@@ -198,16 +198,16 @@ class MyFrame(wx.Frame):
 
         #Правая часть программы, список созданных актов и кнопки для работы с ними:
         #Создание и добавление кнопок в сайзер:
-        self.send_actBTN = wx.Button(panel, id=ID_BTN_SENDACT, label="Отправить Акт")
-        self.del_actBTN = wx.Button(panel, id=ID_BTN_DELACT, label="Удалить файлы")
-        self.refresh_lactsBTN = wx.Button(panel, id=ID_BTN_REFLACT, label="Обновить список")
+        self.send_actBTN = wx.Button(self.panel, id=ID_BTN_SENDACT, label="Отправить Акт")
+        self.del_actBTN = wx.Button(self.panel, id=ID_BTN_DELACT, label="Удалить файлы")
+        self.refresh_lactsBTN = wx.Button(self.panel, id=ID_BTN_REFLACT, label="Обновить список")
         self.rightSSendActsTopBTN.Add(self.send_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rightSSendActsTopBTN.Add(self.del_actBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rightSSendActsTopBTN.Add(self.refresh_lactsBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
 
-        self.open_docx_BTN = wx.Button(panel, id=ID_BTN_OPENDOCX, label="Открыть docx")
-        self.recopy_act_BTN = wx.Button(panel, id=ID_BTN_RECOPYACT, label="Коп. в папку Актов")
-        self.copy_pdf_inbufferBTN = wx.Button(panel, id=ID_BTN_COPYPDFBUFF, label="Коп. pdf в буфер")
+        self.open_docx_BTN = wx.Button(self.panel, id=ID_BTN_OPENDOCX, label="Открыть docx")
+        self.recopy_act_BTN = wx.Button(self.panel, id=ID_BTN_RECOPYACT, label="Коп. в папку Актов")
+        self.copy_pdf_inbufferBTN = wx.Button(self.panel, id=ID_BTN_COPYPDFBUFF, label="Коп. pdf в буфер")
         self.rSizerfileworkBTN.Add(self.open_docx_BTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rSizerfileworkBTN.Add(self.recopy_act_BTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
         self.rSizerfileworkBTN.Add(self.copy_pdf_inbufferBTN, 1, flag=wx.EXPAND | wx.TOP | wx.RIGHT, border=5)
@@ -216,7 +216,7 @@ class MyFrame(wx.Frame):
         self.rightSSendActs.Add(self.rSizerfileworkBTN, proportion=0, flag=wx.EXPAND)
 
         #Создание списка актов
-        self.OLVlocal_acts = ObjectListView(panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+        self.OLVlocal_acts = ObjectListView(self.panel, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         #Создание столбцов
         title = ColumnDefn("Имя", "left", 280, "title", isSpaceFilling=False)
         creating = ColumnDefn("Дата создания", "left", 130, "creating",  stringConverter="%d-%m-%Y %H:%M:%S",
@@ -237,7 +237,7 @@ class MyFrame(wx.Frame):
         self.mainSizer.Add(self.rightSSendActs, proportion=0, flag=wx.EXPAND)
 
         #Назначение главного сайзера
-        panel.SetSizer(self.mainSizer)
+        self.panel.SetSizer(self.mainSizer)
 
         #Назначение событий
         self.Bind(wx.EVT_BUTTON, self.createActOn, id=ID_BTN_CRARCT)
@@ -296,10 +296,12 @@ class MyFrame(wx.Frame):
         self.OLVtempl_acts.SetObjects(db.gettemplateslistfromdb())
 
     def btn_change_templ_act(self, event):
-        print("change act activate")
-        with changetemplatedlg.ChangeTemplDlg(self, title="Изменение шаблона", size=wx.Size(1037, 605)) as dlg:
-            dlg.ShowModal()
-
+        selection = self.OLVtempl_acts.GetSelectedObjects()
+        if selection:
+            with changetemplatedlg.ChangeTemplDlg(self, title="Изменение шаблона", size=wx.Size(500, 600)) as dlg:
+                dlg.ShowModal()
+                self.btn_refresh_templ_act(event)
+            
     def btn_save_templ_act(self, event):
         dlg = wx.TextEntryDialog(self, message="Укажите краткое описание:",
                                  caption="Добавление шаблона",

@@ -41,9 +41,25 @@ def deletetemplatefromdb(num):
         cur = con.cursor()
         cur.execute(f"DELETE FROM templates where templ_num = {num}")
 
+
 def gettemplatetextfromdb(num):
     with sq.connect("templates.db") as con:
         cur = con.cursor()
         cur.execute(f"SELECT paragraphs FROM templates where templ_num = {num}")
         text = cur.fetchone()
         return text[0]
+
+
+def gettemplatedescfromdb(num):
+    with sq.connect("templates.db") as con:
+        cur = con.cursor()
+        cur.execute(f"SELECT description FROM templates where templ_num = {num}")
+        text = cur.fetchone()
+        return text[0]
+
+
+def setupdatetemplateindb(num, desc, text):
+    with sq.connect("templates.db") as con:
+        cur = con.cursor()
+        cur.execute(f"UPDATE templates SET description = '{desc}', paragraphs = '{text}' where templ_num = {num}")
+        
